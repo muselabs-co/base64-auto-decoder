@@ -1,0 +1,46 @@
+{
+  "extensionName": {
+    "message": "Base64 自动解码器",
+    "description": "插件名称"
+  },
+  "extensionDescription": {
+    "message": "自动扫描并解码网页中的 Base64 文本，原地替换并提供一键复制按钮。",
+    "description": "插件描述"
+  },
+  "popupTitle": {
+    "message": "Base64 自动解码",
+    "description": "弹窗标题"
+  },
+  "statusLabel": {
+    "message": "自动解码",
+    "description": "主开关标签"
+  },
+  "statusEnabled": {
+    "message": "已开启",
+    "description": "开启状态提示"
+  },
+  "statusDisabled": {
+    "message": "已关闭",
+    "description": "关闭状态提示"
+  },
+  "tipSync": {
+    "message": "开关状态会自动同步至已打开的网页。",
+    "description": "弹窗底部提示"
+  },
+  "footerVersion": {
+    "message": "v1.0.0",
+    "description": "版本号"
+  },
+  "copyButtonTitle": {
+    "message": "复制解码内容",
+    "description": "复制按钮提示"
+  },
+  "copiedFeedback": {
+    "message": "已复制！",
+    "description": "复制成功提示"
+  },
+  "originalTitle": {
+    "message": "原始 Base64: ",
+    "description": "原串提示前缀"
+  }
+}

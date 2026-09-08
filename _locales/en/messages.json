@@ -1,0 +1,46 @@
+{
+  "extensionName": {
+    "message": "Base64 Auto Decoder",
+    "description": "The name of the extension."
+  },
+  "extensionDescription": {
+    "message": "Automatically scan and decode Base64 text on webpages, replace in-place, and provide a one-click copy button.",
+    "description": "The description of the extension."
+  },
+  "popupTitle": {
+    "message": "Base64 Decoder",
+    "description": "Title in popup header."
+  },
+  "statusLabel": {
+    "message": "Auto Decode",
+    "description": "Label for the main toggle."
+  },
+  "statusEnabled": {
+    "message": "Enabled",
+    "description": "Status text when extension is enabled."
+  },
+  "statusDisabled": {
+    "message": "Disabled",
+    "description": "Status text when extension is disabled."
+  },
+  "tipSync": {
+    "message": "Status syncs across open tabs automatically.",
+    "description": "Hint text at the bottom of popup."
+  },
+  "footerVersion": {
+    "message": "v1.0.0",
+    "description": "Version text in popup."
+  },
+  "copyButtonTitle": {
+    "message": "Copy decoded text",
+    "description": "Tooltip on the copy button."
+  },
+  "copiedFeedback": {
+    "message": "Copied!",
+    "description": "Feedback message when copied."
+  },
+  "originalTitle": {
+    "message": "Original: ",
+    "description": "Prefix in tooltip showing original Base64."
+  }
+}

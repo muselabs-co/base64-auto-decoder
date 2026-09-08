@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="popupTitle">Base64 Decoder</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-card">
+    <header class="popup-header">
+      <div class="brand">
+        <img src="../icons/icon48.png" alt="Logo" class="logo">
+        <div class="title-wrap">
+          <h1 class="title" data-i18n="popupTitle">Base64 Decoder</h1>
+          <span class="badge-version" data-i18n="footerVersion">v1.0.0</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="popup-main">
+      <div class="setting-card">
+        <div class="setting-info">
+          <span class="setting-label" data-i18n="statusLabel">Auto Decode</span>
+          <span class="status-indicator status-enabled" id="status-indicator" data-i18n="statusEnabled">Enabled</span>
+        </div>
+        <label class="switch" for="toggle-switch">
+          <input type="checkbox" id="toggle-switch" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="hint-box">
+        <svg class="hint-icon" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+        </svg>
+        <span class="hint-text" data-i18n="tipSync">Status syncs across open tabs automatically.</span>
+      </div>
+    </main>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

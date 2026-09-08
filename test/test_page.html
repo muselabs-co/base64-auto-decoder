@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Base64 Auto Decoder Test Page</title>
+  <link rel="stylesheet" href="../content/content.css">
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 0 20px;
+      line-height: 1.6;
+      color: #1f2937;
+      background: #f8fafc;
+    }
+    h1 {
+      font-size: 24px;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 12px;
+      margin-bottom: 24px;
+      color: #0f172a;
+    }
+    h2 {
+      font-size: 18px;
+      margin-top: 28px;
+      margin-bottom: 12px;
+      color: #1e293b;
+    }
+    .card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .badge {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-bottom: 8px;
+    }
+    .badge-success {
+      background: #dcfce7;
+      color: #15803d;
+    }
+    .badge-warning {
+      background: #fef9c3;
+      color: #854d0e;
+    }
+    .code-box {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      background: #f1f5f9;
+      padding: 10px 14px;
+      border-radius: 6px;
+      margin-top: 8px;
+    }
+    button.test-btn {
+      background: #2563eb;
+      color: #ffffff;
+      border: none;
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+    button.test-btn:hover {
+      background: #1d4ed8;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔍 Base64 Auto Decoder 浏览器插件测试页面</h1>
+
+  <div class="card">
+    <span class="badge badge-success">正向用例：应该被自动解码并显示复制按钮</span>
+    <p>1. 社区常见微信号分享：我的微信是 d3hpZDoxMjM0NTY3ODk= 请添加时备注来意。</p>
+    <p>2. 中文短语解码：5L2g5aW977yM5LiW55WM 这是一句打招呼的话。</p>
+    <p>3. 网址链接分享：项目地址在 aHR0cHM6Ly9naXRodWIuY29t 欢迎大家前往 Star。</p>
+    <p>4. 磁力链接测试：种子资源地址 bWFnbmV0Oj94dD11cm46YnRpaDoxMjM0NTY3ODk= 速度飞快。</p>
+    <p>5. 英文句子与标点：SGVsbG8gV29ybGQh</p>
+    <p>6. 纯数字解压密码：解压密码是 MTIzNDU2 请注意查收。</p>
+  </div>
+
+  <div class="card">
+    <span class="badge badge-warning">反向用例：普通英文与哈希，绝不能被误解码</span>
+    <p>1. 普通英文单词：this is a test for our internationalization platform.</p>
+    <p>2. Git SHA1 / SHA256 哈希值：commit hash: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 (保持原样)</p>
+    <p>3. 普通纯数字：1234567890 (保持原样)</p>
+  </div>
+
+  <div class="card">
+    <h2>⚡ 动态内容加载测试 (MutationObserver)</h2>
+    <p>点击下方按钮，模拟 SPA 翻页或动态加载一条包含 Base64 的新评论：</p>
+    <button class="test-btn" id="btn-add-dynamic">动态插入新内容</button>
+    <div id="dynamic-container" style="margin-top: 12px;"></div>
+  </div>
+
+  <script>
+    // 动态插入内容事件
+    document.getElementById('btn-add-dynamic').addEventListener('click', () => {
+      const container = document.getElementById('dynamic-container');
+      const p = document.createElement('p');
+      p.className = 'code-box';
+      p.textContent = `[动态加入 ${new Date().toLocaleTimeString()}] 新鲜生成的链接: aHR0cHM6Ly92MmV4LmNvbQ== 以及暗号: 5b+r5LmQ5LiA5aSp`;
+      container.prepend(p);
+    });
+
+    // 本地快速预览 Mock 环境（若未安装插件直接双击打开 html，可自动载入 content.js 演示）
+    if (!window.chrome || !chrome.runtime || !chrome.runtime.id) {
+      console.log('检测到本地直接打开测试页，注入模拟环境运行 content.js...');
+      window.chrome = {
+        i18n: {
+          getMessage: (k) => {
+            const msgs = {
+              copyButtonTitle: '复制解码内容',
+              copiedFeedback: '已复制！',
+              originalTitle: '原始 Base64: '
+            };
+            return msgs[k] || '';
+          }
+        },
+        storage: {
+          sync: {
+            get: (keys, cb) => cb({ enabled: true }),
+            set: (data, cb) => { if(cb) cb(); }
+          },
+          onChanged: {
+            addListener: () => {}
+          }
+        }
+      };
+
+      const script = document.createElement('script');
+      script.src = '../content/content.js';
+      document.body.appendChild(script);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,124 @@
+/* Base64 Auto Decoder Injected Styles */
+
+.b64-decoded-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background-color: rgba(59, 130, 246, 0.08);
+  border-bottom: 1.5px dashed rgba(59, 130, 246, 0.45);
+  border-radius: 3px;
+  padding: 0 3px;
+  margin: 0 1px;
+  position: relative;
+  vertical-align: baseline;
+  text-decoration: none !important;
+  font-style: normal;
+  transition: background-color 0.15s ease;
+}
+
+.b64-decoded-wrapper:hover {
+  background-color: rgba(59, 130, 246, 0.14);
+}
+
+.b64-decoded-text {
+  color: inherit;
+}
+
+/* Copy Button */
+.b64-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  margin-left: 2px;
+  border: none;
+  background: transparent;
+  color: #6b7280;
+  border-radius: 3px;
+  cursor: pointer;
+  line-height: 1;
+  position: relative;
+  vertical-align: middle;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.b64-copy-btn:hover {
+  color: #2563eb;
+  background-color: rgba(37, 99, 235, 0.12);
+}
+
+.b64-copy-btn:active {
+  transform: scale(0.92);
+}
+
+.b64-icon-copy {
+  display: block;
+  stroke: currentColor;
+}
+
+.b64-icon-check {
+  display: none !important;
+  stroke: #10b981;
+}
+
+/* Success / Copied State */
+.b64-copy-btn.b64-copied {
+  color: #10b981;
+  background-color: rgba(16, 185, 129, 0.15);
+}
+
+.b64-copy-btn.b64-copied .b64-icon-copy {
+  display: none !important;
+}
+
+.b64-copy-btn.b64-copied .b64-icon-check {
+  display: block !important;
+}
+
+/* Toast Tooltip on Copy */
+.b64-toast {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #1f2937;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 500;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  padding: 3px 7px;
+  border-radius: 4px;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.15), 0 2px 4px -1px rgba(0, 0, 0, 0.08);
+  z-index: 2147483647;
+  animation: b64-fade-in 0.15s ease-out;
+}
+
+.b64-toast::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -4px;
+  border-width: 4px;
+  border-style: solid;
+  border-color: #1f2937 transparent transparent transparent;
+}
+
+.b64-copy-btn.b64-copied .b64-toast {
+  display: block;
+}
+
+@keyframes b64-fade-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 3px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
