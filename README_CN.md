@@ -1,0 +1,75 @@
+# Base64 Auto Decoder (Chrome Extension)
+
+[English](README.md) | [简体中文](README_CN.md)
+
+一款轻量、纯原生（无框架、零构建依赖）、高精度的网页 Base64 自动解码与快捷管理 Chrome 浏览器插件（Manifest V3）。
+
+## ✨ 核心特性
+
+- **自动扫描 & 原地替换**：页面加载或动态加载（SPA）时自动识别 Base64 并替换为可读明文。
+- **高精度防误判**：
+  - 支持中文 UTF-8 解码（`TextDecoder` 严格校验）。
+  - 智能过滤纯英文单词、UUID、Git Commit SHA1/256 哈希值等，杜绝页面乱码与误伤。
+- **一键复制小图标**：解码明文旁边附带轻巧的复制图标 📋，点击后一秒复制并弹出成功反馈。
+- **原始 Base64 溯源**：鼠标悬停在解码文本上即可查看原串内容。
+- **常用 Base64 快捷管理 (v1.1.0 新增)**：
+  - 在插件弹窗中快速录入常用联系方式（邮箱、URL、文本等）及备注标签。
+  - 自动转换为标准 UTF-8 Base64 字符串并持久化存储（`chrome.storage.sync` 支持多设备同步）。
+  - 双行优雅卡片展示：第一行显示备注标签与明文内容，第二行显示 Base64 等宽代码并附有一键复制按钮。
+- **智能即时识别解码 (v1.1.0 新增)**：
+  - 输入框自动感知 Base64 字符串，实时浮现智能解码卡片（💡 **已识别并解码**）。
+  - 支持「一键复制明文」与「设为明文」，覆盖微信、Slack、终端、PDF 等非网页场景下的即时解码需求。
+- **极简弹窗总开关**：点击插件图标展示极简 ON/OFF 卡片开关，切换时即时同步至打开的网页，关闭时原地恢复原串。
+- **原生极简 & 零依赖**：基于原生 HTML/CSS/JavaScript 构建，无任何第三方重型依赖或打包流程。
+- **内置 i18n 国际化**：原生支持中文（简体 `zh_CN`）和英文（`en`）。
+
+## 📂 项目结构
+
+```
+base64-decoder/
+├── manifest.json            # Manifest V3 扩展配置文件
+├── _locales/                # 原生国际化多语言包
+│   ├── en/messages.json     # 英文文案
+│   └── zh_CN/messages.json  # 中文文案
+├── popup/                   # 插件弹窗控制面板 (原生 HTML/CSS/JS)
+│   ├── popup.html           # 弹窗结构 (开关 + 智能解码 + 常用管理)
+│   ├── popup.css            # 弹窗精致样式与深色模式适配
+│   └── popup.js             # 常用项管理、智能感知解码与存储逻辑
+├── content/                 # 页面内容注入脚本与样式
+│   ├── content.js           # 核心扫描、解码校验、DOM 替换与复制交互
+│   └── content.css          # 原地替换与复制图标样式
+├── icons/                   # 插件高品质图标 (16x16, 48x48, 128x128)
+│   └── generate_icons.py
+└── test/                    # 测试用例与独立验证
+    ├── test_page.html       # 包含正向/反向用例与动态追加的测试网页
+    └── verify_decoder.js    # Node.js 解码准确度与防误判单元测试
+```
+
+## 🚀 安装与使用指南
+
+### 方式 1：从 GitHub Release 下载安装（推荐）
+1. 在本仓库的 [Releases](https://github.com/muselabs-co/base64-auto-decoder/releases) 页面下载最新的 `base64-decoder-v1.1.0.zip`。
+2. 解压下载的 zip 文件到一个固定目录。
+3. 打开 Chrome 浏览器，在地址栏输入 `chrome://extensions/` 回车。
+4. 打开右上角的 **“开发者模式” (Developer mode)** 开关。
+5. 点击左上角 **“加载已解压的扩展程序” (Load unpacked)**，选择解压出的目录。
+6. 安装完成！点击浏览器右上角扩展栏即可使用。
+
+### 方式 2：源码安装
+1. 克隆本仓库到本地：
+   ```bash
+   git clone git@github.com:muselabs-co/base64-auto-decoder.git
+   ```
+2. 打开 Chrome，访问 `chrome://extensions/` 并开启“开发者模式”。
+3. 点击“加载已解压的扩展程序”，选择项目根目录即可。
+
+## 🧪 测试验证
+
+- **方式 1（浏览器真实测试）**：
+  安装插件后，在 Chrome 中直接打开 `test/test_page.html`，即可看到各类 Base64 文本被原地解码并附带复制小图标。
+- **方式 2（命令行单元测试）**：
+  在项目根目录下运行：
+  ```bash
+  node test/verify_decoder.js
+  ```
+
