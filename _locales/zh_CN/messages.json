@@ -42,5 +42,37 @@
   "originalTitle": {
     "message": "原始 Base64: ",
     "description": "原串提示前缀"
+  },
+  "snippetsTitle": {
+    "message": "常用 Base64 管理",
+    "description": "常用管理标题"
+  },
+  "inputPlaceholder": {
+    "message": "输入文本 (如邮箱、微信等)...",
+    "description": "明文输入框占位符"
+  },
+  "tagPlaceholder": {
+    "message": "标签 (选填)",
+    "description": "标签输入框占位符"
+  },
+  "btnAdd": {
+    "message": "添加",
+    "description": "添加按钮文案"
+  },
+  "btnCopy": {
+    "message": "复制",
+    "description": "复制按钮文案"
+  },
+  "btnCopied": {
+    "message": "已复制!",
+    "description": "复制成功提示"
+  },
+  "btnDelete": {
+    "message": "删除",
+    "description": "删除按钮提示"
+  },
+  "emptySnippets": {
+    "message": "暂无常用项，添加后即可一键复制",
+    "description": "常用列表为空提示"
   }
 }

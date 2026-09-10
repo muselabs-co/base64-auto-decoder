@@ -4,6 +4,11 @@
   --text-muted: #6b7280;
   --card-bg: #f9fafb;
   --card-border: #e5e7eb;
+  --input-bg: #ffffff;
+  --input-border: #d1d5db;
+  --snippet-b64-bg: #f3f4f6;
+  --tag-bg: #eff6ff;
+  --tag-text: #2563eb;
   --primary: #2563eb;
   --primary-hover: #1d4ed8;
   --success: #10b981;
@@ -18,6 +23,11 @@
     --text-muted: #a1a1aa;
     --card-bg: #27272a;
     --card-border: #3f3f46;
+    --input-bg: #1f1f23;
+    --input-border: #52525b;
+    --snippet-b64-bg: #1f1f23;
+    --tag-bg: #1e293b;
+    --tag-text: #60a5fa;
     --primary: #3b82f6;
     --primary-hover: #60a5fa;
     --switch-off: #52525b;
@@ -31,7 +41,7 @@
 }
 
 body {
-  width: 260px;
+  width: 330px;
   background-color: var(--bg-color);
   color: var(--text-main);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -97,6 +107,7 @@ body {
   align-items: center;
   justify-content: space-between;
   transition: all 0.2s ease;
+  margin-bottom: 12px;
 }
 
 .setting-info {
@@ -176,12 +187,261 @@ input:checked + .slider:before {
   transform: translateX(20px);
 }
 
+/* Snippets Section */
+.snippets-section {
+  border-top: 1px solid var(--card-border);
+  padding-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.section-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.snippet-count {
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--card-border);
+  color: var(--text-muted);
+  border-radius: 10px;
+  padding: 1px 7px;
+}
+
+/* Snippet Form */
+.snippet-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-row {
+  width: 100%;
+}
+
+.form-row-inline {
+  display: flex;
+  gap: 6px;
+}
+
+.input-field {
+  width: 100%;
+  padding: 6px 10px;
+  border: 1px solid var(--input-border);
+  border-radius: 6px;
+  font-size: 12px;
+  background: var(--input-bg);
+  color: var(--text-main);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  font-family: inherit;
+}
+
+.input-field:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+.input-tag {
+  flex: 1;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  flex-shrink: 0;
+}
+
+.btn-primary:hover {
+  background: var(--primary-hover);
+}
+
+.btn-primary:active {
+  transform: scale(0.97);
+}
+
+/* Snippet List */
+.snippet-list {
+  max-height: 180px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-right: 2px;
+}
+
+.snippet-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.snippet-list::-webkit-scrollbar-thumb {
+  background-color: var(--card-border);
+  border-radius: 4px;
+}
+
+.empty-state {
+  text-align: center;
+  font-size: 11px;
+  color: var(--text-muted);
+  padding: 14px 8px;
+  background: var(--card-bg);
+  border: 1px dashed var(--card-border);
+  border-radius: 8px;
+}
+
+/* Snippet Card */
+.snippet-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.snippet-card:hover {
+  border-color: var(--primary);
+}
+
+/* Row 1: Label + Text + Delete */
+.snippet-row-1 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.snippet-header-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+  flex: 1;
+}
+
+.snippet-tag {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--tag-text);
+  background: var(--tag-bg);
+  padding: 1px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.snippet-text {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-main);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.btn-icon {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px;
+  border-radius: 4px;
+  color: var(--text-muted);
+  transition: color 0.15s, background-color 0.15s;
+  flex-shrink: 0;
+}
+
+.btn-icon:hover {
+  color: var(--danger);
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+.btn-icon svg {
+  width: 13px;
+  height: 13px;
+}
+
+/* Row 2: Base64 + Copy */
+.snippet-row-2 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: var(--snippet-b64-bg);
+  border-radius: 5px;
+  padding: 4px 6px;
+}
+
+.snippet-b64 {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 10.5px;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  user-select: text;
+}
+
+.btn-copy-b64 {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--card-border);
+  background: var(--card-bg);
+  color: var(--text-main);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.btn-copy-b64:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.btn-copy-b64.copied {
+  background: var(--success);
+  border-color: var(--success);
+  color: #ffffff;
+}
+
+.btn-copy-b64 svg {
+  width: 12px;
+  height: 12px;
+}
+
 /* Hint Box */
 .hint-box {
   display: flex;
   align-items: flex-start;
   gap: 6px;
   padding: 0 2px;
+  margin-top: 12px;
 }
 
 .hint-icon {
@@ -197,3 +457,4 @@ input:checked + .slider:before {
   color: var(--text-muted);
   line-height: 1.4;
 }
+

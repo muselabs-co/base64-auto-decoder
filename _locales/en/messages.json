@@ -42,5 +42,37 @@
   "originalTitle": {
     "message": "Original: ",
     "description": "Prefix in tooltip showing original Base64."
+  },
+  "snippetsTitle": {
+    "message": "Quick Base64",
+    "description": "Title for quick base64 snippets section."
+  },
+  "inputPlaceholder": {
+    "message": "Enter text (email, WeChat, etc.)...",
+    "description": "Placeholder for text input."
+  },
+  "tagPlaceholder": {
+    "message": "Tag (optional)",
+    "description": "Placeholder for tag input."
+  },
+  "btnAdd": {
+    "message": "Add",
+    "description": "Text for add button."
+  },
+  "btnCopy": {
+    "message": "Copy",
+    "description": "Text for copy button."
+  },
+  "btnCopied": {
+    "message": "Copied!",
+    "description": "Feedback when copied."
+  },
+  "btnDelete": {
+    "message": "Delete",
+    "description": "Tooltip for delete button."
+  },
+  "emptySnippets": {
+    "message": "No saved items. Add one for quick copying.",
+    "description": "Text when snippets list is empty."
   }
 }

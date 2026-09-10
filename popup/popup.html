@@ -30,6 +30,30 @@
         </label>
       </div>
 
+      <!-- Quick Base64 Section -->
+      <section class="snippets-section">
+        <div class="section-header">
+          <span class="section-title" data-i18n="snippetsTitle">常用 Base64 管理</span>
+          <span class="snippet-count" id="snippet-count">0</span>
+        </div>
+
+        <!-- Add Snippet Form -->
+        <form id="add-snippet-form" class="snippet-form">
+          <div class="form-row">
+            <input type="text" id="input-text" class="input-field" placeholder="输入文本 (如邮箱、微信等)..." data-i18n-placeholder="inputPlaceholder" required autocomplete="off">
+          </div>
+          <div class="form-row form-row-inline">
+            <input type="text" id="input-tag" class="input-field input-tag" placeholder="标签 (选填)" data-i18n-placeholder="tagPlaceholder" autocomplete="off" maxlength="12">
+            <button type="submit" id="btn-add" class="btn-primary" data-i18n="btnAdd">添加</button>
+          </div>
+        </form>
+
+        <!-- Snippet List -->
+        <div id="snippet-list" class="snippet-list">
+          <!-- Dynamically populated -->
+        </div>
+      </section>
+
       <div class="hint-box">
         <svg class="hint-icon" viewBox="0 0 20 20" fill="currentColor">
           <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
