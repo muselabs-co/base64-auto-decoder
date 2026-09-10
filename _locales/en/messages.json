@@ -28,7 +28,7 @@
     "description": "Hint text at the bottom of popup."
   },
   "footerVersion": {
-    "message": "v1.0.0",
+    "message": "v1.1.0",
     "description": "Version text in popup."
   },
   "copyButtonTitle": {
