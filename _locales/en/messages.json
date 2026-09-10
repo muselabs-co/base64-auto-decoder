@@ -48,7 +48,7 @@
     "description": "Title for quick base64 snippets section."
   },
   "inputPlaceholder": {
-    "message": "Enter text (email, WeChat, etc.)...",
+    "message": "Enter text (email, URL, etc.)...",
     "description": "Placeholder for text input."
   },
   "tagPlaceholder": {
@@ -74,5 +74,17 @@
   "emptySnippets": {
     "message": "No saved items. Add one for quick copying.",
     "description": "Text when snippets list is empty."
+  },
+  "smartDecodedLabel": {
+    "message": "Decoded",
+    "description": "Label for smart decoded Base64 preview"
+  },
+  "btnCopyPlain": {
+    "message": "Copy Text",
+    "description": "Button to copy decoded plain text"
+  },
+  "btnUsePlain": {
+    "message": "Use Plain",
+    "description": "Button to fill input with plain text"
   }
 }

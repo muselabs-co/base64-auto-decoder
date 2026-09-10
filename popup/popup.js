@@ -88,6 +88,39 @@ document.addEventListener('DOMContentLoaded', () => {
     return btoa(binString);
   }
 
+  function decodeBase64Text(candidate) {
+    if (!candidate || candidate.length < 4) return null;
+    const cleaned = candidate.trim();
+    if (!/^[A-Za-z0-9+/_-]+={0,2}$/.test(cleaned)) return null;
+
+    let normalized = cleaned.replace(/-/g, '+').replace(/_/g, '/');
+    while (normalized.length % 4 !== 0) {
+      normalized += '=';
+    }
+
+    try {
+      const binaryStr = atob(normalized);
+      if (!binaryStr || binaryStr.length === 0) return null;
+      const bytes = new Uint8Array(binaryStr.length);
+      for (let i = 0; i < binaryStr.length; i++) {
+        bytes[i] = binaryStr.charCodeAt(i);
+      }
+      const decoder = new TextDecoder('utf-8', { fatal: true });
+      const text = decoder.decode(bytes);
+
+      if (!text || text.trim().length === 0) return null;
+      if (text.trim() === cleaned) return null;
+      if (/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/.test(text)) return null;
+
+      const allowedRegex = /^[\s\x20-\x7E\u00A0-\u024F\u0400-\u04FF\u2000-\u206F\u20A0-\u20CF\u3000-\u303F\u3040-\u30FF\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\uFF00-\uFFEF\u{1F300}-\u{1FAFF}]+$/u;
+      if (!allowedRegex.test(text)) return null;
+
+      return text;
+    } catch (e) {
+      return null;
+    }
+  }
+
   const ICON_COPY = `<svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>`;
   const ICON_CHECK = `<svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/></svg>`;
   const ICON_TRASH = `<svg viewBox="0 0 16 16" fill="currentColor"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/><path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/></svg>`;
@@ -98,6 +131,49 @@ document.addEventListener('DOMContentLoaded', () => {
   const inputTag = document.getElementById('input-tag');
   const snippetList = document.getElementById('snippet-list');
   const snippetCount = document.getElementById('snippet-count');
+
+  // Smart Decode Preview Elements
+  const smartDecodeCard = document.getElementById('smart-decode-card');
+  const smartDecodeText = document.getElementById('smart-decode-text');
+  const btnCopyDecoded = document.getElementById('btn-copy-decoded');
+  const btnUseDecoded = document.getElementById('btn-use-decoded');
+  let currentDecodedText = '';
+
+  inputText.addEventListener('input', () => {
+    const val = inputText.value.trim();
+    const decoded = decodeBase64Text(val);
+    if (decoded) {
+      currentDecodedText = decoded;
+      smartDecodeText.textContent = decoded;
+      smartDecodeCard.classList.remove('hidden');
+    } else {
+      currentDecodedText = '';
+      smartDecodeCard.classList.add('hidden');
+    }
+  });
+
+  btnCopyDecoded.addEventListener('click', () => {
+    if (!currentDecodedText) return;
+    navigator.clipboard.writeText(currentDecodedText).then(() => {
+      const copyPlainLabel = getMsg('btnCopyPlain', '复制明文');
+      const copiedLabel = getMsg('btnCopied', '已复制!');
+      btnCopyDecoded.classList.add('copied');
+      btnCopyDecoded.innerHTML = `${ICON_CHECK}<span>${copiedLabel}</span>`;
+
+      setTimeout(() => {
+        btnCopyDecoded.classList.remove('copied');
+        btnCopyDecoded.innerHTML = `<svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg><span>${copyPlainLabel}</span>`;
+      }, 1400);
+    });
+  });
+
+  btnUseDecoded.addEventListener('click', () => {
+    if (!currentDecodedText) return;
+    inputText.value = currentDecodedText;
+    currentDecodedText = '';
+    smartDecodeCard.classList.add('hidden');
+    inputText.focus();
+  });
 
   let currentSnippets = [];
 
@@ -226,6 +302,8 @@ document.addEventListener('DOMContentLoaded', () => {
     saveSnippets(updated);
 
     form.reset();
+    currentDecodedText = '';
+    smartDecodeCard.classList.add('hidden');
     inputText.focus();
   });
 

@@ -48,7 +48,7 @@
     "description": "常用管理标题"
   },
   "inputPlaceholder": {
-    "message": "输入文本 (如邮箱、微信等)...",
+    "message": "输入文本 (如邮箱、URL等)...",
     "description": "明文输入框占位符"
   },
   "tagPlaceholder": {
@@ -74,5 +74,17 @@
   "emptySnippets": {
     "message": "暂无常用项，添加后即可一键复制",
     "description": "常用列表为空提示"
+  },
+  "smartDecodedLabel": {
+    "message": "已识别并解码",
+    "description": "智能识别 Base64 标签"
+  },
+  "btnCopyPlain": {
+    "message": "复制明文",
+    "description": "智能解码复制明文按钮"
+  },
+  "btnUsePlain": {
+    "message": "设为明文",
+    "description": "智能解码填入明文按钮"
   }
 }
