@@ -21,33 +21,140 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       };
 
+  const MESSAGES = {
+    en: {
+      popupTitle: 'Base64 Decoder',
+      footerVersion: 'v1.2.0',
+      statusLabel: 'Auto Decode',
+      statusEnabled: 'Enabled',
+      statusDisabled: 'Disabled',
+      siteSettingLabel: 'Current Site',
+      blacklistTitle: 'Blacklist Management',
+      domainPlaceholder: 'Enter domain (e.g. v2ex.com)...',
+      btnAddDomain: 'Add',
+      emptyBlacklist: 'No disabled websites. Auto-decode is active on all sites.',
+      btnRemoveDomain: 'Remove from blacklist',
+      snippetsTitle: 'Quick Base64',
+      inputPlaceholder: 'Enter text (email, URL, etc.)...',
+      tagPlaceholder: 'Tag (optional)',
+      btnAdd: 'Add',
+      btnCopy: 'Copy',
+      btnCopied: 'Copied!',
+      btnDelete: 'Delete',
+      emptySnippets: 'No saved items. Add one for quick copying.',
+      smartDecodedLabel: 'Decoded',
+      btnCopyPlain: 'Copy Text',
+      btnUsePlain: 'Use Plain',
+      btnCopyPayload: 'Copy Payload',
+      tipSync: 'Status syncs across open tabs automatically.'
+    },
+    zh_CN: {
+      popupTitle: 'Base64 自动解码',
+      footerVersion: 'v1.2.0',
+      statusLabel: '自动解码',
+      statusEnabled: '已开启',
+      statusDisabled: '已关闭',
+      siteSettingLabel: '当前网站',
+      blacklistTitle: '网站黑名单管理',
+      domainPlaceholder: '输入域名 (如 v2ex.com)...',
+      btnAddDomain: '添加',
+      emptyBlacklist: '暂无禁用网站，所有网站默认自动解码',
+      btnRemoveDomain: '移出黑名单',
+      snippetsTitle: '常用 Base64 管理',
+      inputPlaceholder: '输入文本 (如邮箱、URL等)...',
+      tagPlaceholder: '标签 (选填)',
+      btnAdd: '添加',
+      btnCopy: '复制',
+      btnCopied: '已复制!',
+      btnDelete: '删除',
+      emptySnippets: '暂无常用项，添加后即可一键复制',
+      smartDecodedLabel: '已识别并解码',
+      btnCopyPlain: '复制明文',
+      btnUsePlain: '设为明文',
+      btnCopyPayload: '复制 Payload',
+      tipSync: '开关状态会自动同步至已打开的网页。'
+    }
+  };
+
+  let currentLang = 'en'; // Default to English as requested
+
   function getMsg(key, defaultMsg = '') {
+    const table = MESSAGES[currentLang] || MESSAGES.en;
+    if (table[key] !== undefined) return table[key];
     if (typeof chrome !== 'undefined' && chrome.i18n && chrome.i18n.getMessage) {
       return chrome.i18n.getMessage(key) || defaultMsg;
     }
     return defaultMsg;
   }
 
-  // 1. Initialize i18n for text content and placeholders
-  document.querySelectorAll('[data-i18n]').forEach((elem) => {
-    const key = elem.getAttribute('data-i18n');
-    const msg = getMsg(key);
-    if (msg) {
-      elem.textContent = msg;
-    }
+  function normalizeDomain(host) {
+    if (!host) return '';
+    return host.toLowerCase().trim().replace(/^https?:\/\//, '').split('/')[0].split(':')[0].replace(/^www\./, '').replace(/^\.+/, '');
+  }
+
+  function isDomainDisabled(host, disabledList) {
+    const normHost = normalizeDomain(host);
+    if (!normHost) return false;
+    return (disabledList || []).some((item) => {
+      const normItem = normalizeDomain(item);
+      return normHost === normItem || normHost.endsWith('.' + normItem);
+    });
+  }
+
+  function applyLanguage(lang) {
+    currentLang = lang === 'zh_CN' || lang === 'zh' ? 'zh_CN' : 'en';
+
+    const langEnSpan = document.getElementById('lang-en');
+    const langZhSpan = document.getElementById('lang-zh');
+    if (langEnSpan) langEnSpan.classList.toggle('active', currentLang === 'en');
+    if (langZhSpan) langZhSpan.classList.toggle('active', currentLang === 'zh_CN');
+    document.documentElement.lang = currentLang === 'en' ? 'en' : 'zh-CN';
+
+    document.querySelectorAll('[data-i18n]').forEach((elem) => {
+      const key = elem.getAttribute('data-i18n');
+      const msg = getMsg(key);
+      if (msg) elem.textContent = msg;
+    });
+
+    document.querySelectorAll('[data-i18n-placeholder]').forEach((elem) => {
+      const key = elem.getAttribute('data-i18n-placeholder');
+      const msg = getMsg(key);
+      if (msg) elem.placeholder = msg;
+    });
+
+    // Re-render components with translated dynamic texts
+    storage.get({ enabled: true, disabledDomains: [], snippets: [] }, (res) => {
+      updateStatusUI(res.enabled !== false);
+      updateSiteUI(res.disabledDomains || []);
+      renderBlacklist(res.disabledDomains || []);
+      renderSnippets(res.snippets || []);
+    });
+  }
+
+  const langToggleBtn = document.getElementById('lang-toggle-btn');
+  if (langToggleBtn) {
+    langToggleBtn.addEventListener('click', () => {
+      const nextLang = currentLang === 'en' ? 'zh_CN' : 'en';
+      storage.set({ userLang: nextLang }, () => {
+        applyLanguage(nextLang);
+      });
+    });
+  }
+
+  // Initial load of language preference (defaults to 'en')
+  storage.get({ userLang: 'en' }, (res) => {
+    applyLanguage(res.userLang || 'en');
   });
 
-  document.querySelectorAll('[data-i18n-placeholder]').forEach((elem) => {
-    const key = elem.getAttribute('data-i18n-placeholder');
-    const msg = getMsg(key);
-    if (msg) {
-      elem.placeholder = msg;
-    }
-  });
-
-  // 2. Main Auto-Decode Switch
+  // 2. Main Auto-Decode Switch & Current Site Switch
   const toggle = document.getElementById('toggle-switch');
   const indicator = document.getElementById('status-indicator');
+
+  const siteCard = document.getElementById('site-card');
+  const siteDomain = document.getElementById('site-domain');
+  const siteStatusIndicator = document.getElementById('site-status-indicator');
+  const siteToggleSwitch = document.getElementById('site-toggle-switch');
+  let currentHost = '';
 
   function updateStatusUI(enabled) {
     toggle.checked = enabled;
@@ -71,6 +178,154 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Current Site Logic
+  function updateSiteUI(disabledDomains) {
+    if (!currentHost) return;
+    const isSiteEnabled = !isDomainDisabled(currentHost, disabledDomains);
+
+    // Top site card toggle & indicator
+    siteToggleSwitch.checked = isSiteEnabled;
+    if (isSiteEnabled) {
+      siteStatusIndicator.textContent = getMsg('statusEnabled', 'Enabled');
+      siteStatusIndicator.className = 'status-indicator status-enabled';
+    } else {
+      siteStatusIndicator.textContent = getMsg('statusDisabled', 'Disabled');
+      siteStatusIndicator.className = 'status-indicator status-disabled';
+    }
+  }
+
+  // Blacklist Management Logic
+  const blacklistSection = document.getElementById('blacklist-section');
+  const blacklistHeader = document.getElementById('blacklist-header');
+  const blacklistCount = document.getElementById('blacklist-count');
+  const blacklistList = document.getElementById('blacklist-list');
+  const addBlacklistForm = document.getElementById('add-blacklist-form');
+  const inputDomain = document.getElementById('input-domain');
+  let currentDisabledDomains = [];
+
+  blacklistHeader.addEventListener('click', () => {
+    blacklistSection.classList.toggle('collapsed');
+  });
+
+  function renderBlacklist(domains) {
+    currentDisabledDomains = domains || [];
+    blacklistCount.textContent = currentDisabledDomains.length;
+
+    if (currentDisabledDomains.length === 0) {
+      const emptyMsg = getMsg('emptyBlacklist', 'No disabled websites. Auto-decode is active on all sites.');
+      blacklistList.innerHTML = `<div class="empty-state">${escapeHTML(emptyMsg)}</div>`;
+      return;
+    }
+
+    blacklistList.innerHTML = '';
+    const removeLabel = getMsg('btnRemoveDomain', 'Remove from blacklist');
+
+    currentDisabledDomains.forEach((domain) => {
+      const item = document.createElement('div');
+      item.className = 'blacklist-item';
+
+      const nameSpan = document.createElement('span');
+      nameSpan.className = 'blacklist-domain-name';
+      nameSpan.textContent = domain;
+      nameSpan.title = domain;
+
+      const delBtn = document.createElement('button');
+      delBtn.className = 'btn-icon btn-delete';
+      delBtn.type = 'button';
+      delBtn.title = removeLabel;
+      delBtn.innerHTML = ICON_TRASH;
+      delBtn.addEventListener('click', () => removeDomainFromBlacklist(domain));
+
+      item.appendChild(nameSpan);
+      item.appendChild(delBtn);
+      blacklistList.appendChild(item);
+    });
+  }
+
+  function saveBlacklist(domains) {
+    storage.set({ disabledDomains: domains }, () => {
+      renderBlacklist(domains);
+      updateSiteUI(domains);
+    });
+  }
+
+  function removeDomainFromBlacklist(domain) {
+    const normTarget = normalizeDomain(domain);
+    const updated = currentDisabledDomains.filter((d) => normalizeDomain(d) !== normTarget);
+    saveBlacklist(updated);
+  }
+
+  addBlacklistForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    let val = normalizeDomain(inputDomain.value);
+    if (!val || val.length < 3 || !val.includes('.')) {
+      return;
+    }
+
+    if (!currentDisabledDomains.some((d) => normalizeDomain(d) === val)) {
+      const updated = [val, ...currentDisabledDomains];
+      saveBlacklist(updated);
+    }
+
+    inputDomain.value = '';
+  });
+
+  // Initial Blacklist Load
+  storage.get({ disabledDomains: [] }, (res) => {
+    renderBlacklist(res.disabledDomains || []);
+  });
+
+  if (typeof chrome !== 'undefined' && chrome.tabs && chrome.tabs.query) {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      if (tabs && tabs[0] && tabs[0].url) {
+        try {
+          const url = new URL(tabs[0].url);
+          if (url.protocol === 'http:' || url.protocol === 'https:') {
+            currentHost = normalizeDomain(url.hostname);
+            siteDomain.textContent = currentHost;
+            siteDomain.title = currentHost;
+            siteCard.style.display = 'flex';
+            storage.get({ disabledDomains: [] }, (res) => {
+              const list = res.disabledDomains || [];
+              updateSiteUI(list);
+              renderBlacklist(list);
+            });
+          }
+        } catch (e) {}
+      }
+    });
+  } else {
+    // Local / Dev preview fallback
+    currentHost = 'v2ex.com';
+    siteDomain.textContent = currentHost;
+    siteDomain.title = currentHost;
+    siteCard.style.display = 'flex';
+    storage.get({ disabledDomains: [] }, (res) => {
+      const list = res.disabledDomains || [];
+      updateSiteUI(list);
+      renderBlacklist(list);
+    });
+  }
+
+  siteToggleSwitch.addEventListener('change', () => {
+    if (!currentHost) return;
+    const normCurrent = normalizeDomain(currentHost);
+    storage.get({ disabledDomains: [] }, (res) => {
+      let list = res.disabledDomains || [];
+      if (siteToggleSwitch.checked) {
+        list = list.filter((h) => normalizeDomain(h) !== normCurrent);
+      } else {
+        if (!isDomainDisabled(normCurrent, list)) {
+          list.push(normCurrent);
+        }
+      }
+      storage.set({ disabledDomains: list }, () => {
+        updateSiteUI(list);
+        renderBlacklist(list);
+      });
+    });
+  });
+
   // 3. Helper Functions
   function escapeHTML(str) {
     return String(str).replace(/[&<>'"]/g, (tag) => ({
@@ -86,6 +341,41 @@ document.addEventListener('DOMContentLoaded', () => {
     const bytes = new TextEncoder().encode(str);
     const binString = Array.from(bytes, (byte) => String.fromCharCode(byte)).join('');
     return btoa(binString);
+  }
+
+  function tryParseJWT(token) {
+    if (!token || typeof token !== 'string') return null;
+    const parts = token.trim().split('.');
+    if (parts.length !== 3) return null;
+
+    function decodeB64Url(str) {
+      let norm = str.replace(/-/g, '+').replace(/_/g, '/');
+      while (norm.length % 4 !== 0) norm += '=';
+      const bin = atob(norm);
+      const bytes = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      return new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+    }
+
+    try {
+      const headerStr = decodeB64Url(parts[0]);
+      const payloadStr = decodeB64Url(parts[1]);
+      const headerObj = JSON.parse(headerStr);
+      const payloadObj = JSON.parse(payloadStr);
+
+      if (!headerObj || typeof headerObj !== 'object' || (!headerObj.alg && !headerObj.typ)) {
+        return null;
+      }
+
+      return {
+        header: headerObj,
+        payload: payloadObj,
+        headerRaw: JSON.stringify(headerObj, null, 2),
+        payloadRaw: JSON.stringify(payloadObj, null, 2)
+      };
+    } catch (e) {
+      return null;
+    }
   }
 
   function decodeBase64Text(candidate) {
@@ -141,11 +431,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
   inputText.addEventListener('input', () => {
     const val = inputText.value.trim();
+
+    // 1. Check JWT
+    const jwtInfo = tryParseJWT(val);
+    if (jwtInfo) {
+      currentDecodedText = jwtInfo.payloadRaw;
+      smartDecodeText.textContent = `[Header]\n${jwtInfo.headerRaw}\n\n[Payload]\n${jwtInfo.payloadRaw}`;
+      smartDecodeCard.classList.remove('hidden');
+      const badgeSpan = smartDecodeCard.querySelector('.smart-decode-badge span');
+      if (badgeSpan) badgeSpan.textContent = 'JWT Token';
+      const copySpan = btnCopyDecoded.querySelector('span');
+      if (copySpan) copySpan.textContent = getMsg('btnCopyPayload', '复制 Payload');
+      return;
+    }
+
+    // 2. Check regular Base64
     const decoded = decodeBase64Text(val);
     if (decoded) {
       currentDecodedText = decoded;
       smartDecodeText.textContent = decoded;
       smartDecodeCard.classList.remove('hidden');
+      const badgeSpan = smartDecodeCard.querySelector('.smart-decode-badge span');
+      if (badgeSpan) badgeSpan.textContent = getMsg('smartDecodedLabel', '已识别并解码');
+      const copySpan = btnCopyDecoded.querySelector('span');
+      if (copySpan) copySpan.textContent = getMsg('btnCopyPlain', '复制明文');
     } else {
       currentDecodedText = '';
       smartDecodeCard.classList.add('hidden');
@@ -155,14 +464,14 @@ document.addEventListener('DOMContentLoaded', () => {
   btnCopyDecoded.addEventListener('click', () => {
     if (!currentDecodedText) return;
     navigator.clipboard.writeText(currentDecodedText).then(() => {
-      const copyPlainLabel = getMsg('btnCopyPlain', '复制明文');
       const copiedLabel = getMsg('btnCopied', '已复制!');
+      const prevHTML = btnCopyDecoded.innerHTML;
       btnCopyDecoded.classList.add('copied');
       btnCopyDecoded.innerHTML = `${ICON_CHECK}<span>${copiedLabel}</span>`;
 
       setTimeout(() => {
         btnCopyDecoded.classList.remove('copied');
-        btnCopyDecoded.innerHTML = `<svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg><span>${copyPlainLabel}</span>`;
+        btnCopyDecoded.innerHTML = prevHTML;
       }, 1400);
     });
   });

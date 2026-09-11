@@ -28,7 +28,7 @@
     "description": "弹窗底部提示"
   },
   "footerVersion": {
-    "message": "v1.1.0",
+    "message": "v1.2.0",
     "description": "版本号"
   },
   "copyButtonTitle": {
@@ -86,5 +86,85 @@
   "btnUsePlain": {
     "message": "设为明文",
     "description": "智能解码填入明文按钮"
+  },
+  "menuEncodeSelection": {
+    "message": "转换为 Base64",
+    "description": "右键选中文本转Base64"
+  },
+  "menuDecodeSelection": {
+    "message": "Base64 解码",
+    "description": "右键选中文本Base64解码"
+  },
+  "toastEncoded": {
+    "message": "已转换为 Base64 并复制到剪贴板！",
+    "description": "右键编码成功提示"
+  },
+  "toastDecoded": {
+    "message": "解码成功，已复制到剪贴板！",
+    "description": "右键解码成功提示"
+  },
+  "toastDecodeFailed": {
+    "message": "所选内容非有效 Base64 文本",
+    "description": "右键解码失败提示"
+  },
+  "siteSettingLabel": {
+    "message": "当前网站",
+    "description": "当前网站控制卡片标签"
+  },
+  "jwtBadgeTitle": {
+    "message": "JWT 令牌",
+    "description": "JWT 标识徽章"
+  },
+  "jwtHeaderLabel": {
+    "message": "标头 (Header)",
+    "description": "JWT Header 标签"
+  },
+  "jwtPayloadLabel": {
+    "message": "负载 (Payload)",
+    "description": "JWT Payload 标签"
+  },
+  "btnCopyPayload": {
+    "message": "复制 Payload",
+    "description": "复制 JWT Payload 按钮"
+  },
+  "imageBadgeTitle": {
+    "message": "Base64 图片",
+    "description": "Base64 图片标识"
+  },
+  "btnDownloadImage": {
+    "message": "下载图片",
+    "description": "下载 Base64 图片按钮"
+  },
+  "btnCopyDataUrl": {
+    "message": "复制图片链接",
+    "description": "复制 Base64 Data URL 按钮"
+  },
+  "blacklistTitle": {
+    "message": "网站黑名单管理",
+    "description": "黑名单管理标题"
+  },
+  "emptyBlacklist": {
+    "message": "暂无禁用网站，所有网站默认自动解码",
+    "description": "黑名单为空时的提示"
+  },
+  "btnAddDomain": {
+    "message": "添加",
+    "description": "添加黑名单域名按钮"
+  },
+  "domainPlaceholder": {
+    "message": "输入域名 (如 v2ex.com)...",
+    "description": "黑名单输入框占位符"
+  },
+  "btnRemoveDomain": {
+    "message": "移出黑名单",
+    "description": "移出黑名单按钮提示"
+  },
+  "originalBadgeTitle": {
+    "message": "原始 Base64",
+    "description": "原串浮窗标题"
+  },
+  "btnCopyOriginal": {
+    "message": "复制原始 Base64",
+    "description": "复制原始 Base64 按钮"
   }
 }

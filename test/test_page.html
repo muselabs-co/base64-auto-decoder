@@ -3,29 +3,61 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Base64 Auto Decoder Test Page</title>
+  <title id="page-title">Base64 Auto Decoder Test Page</title>
   <link rel="stylesheet" href="../content/content.css">
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      max-width: 800px;
-      margin: 40px auto;
+      max-width: 820px;
+      margin: 30px auto;
       padding: 0 20px;
       line-height: 1.6;
       color: #1f2937;
       background: #f8fafc;
     }
-    h1 {
-      font-size: 24px;
+    .header-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       border-bottom: 2px solid #e2e8f0;
-      padding-bottom: 12px;
+      padding-bottom: 14px;
       margin-bottom: 24px;
+      gap: 16px;
+    }
+    h1 {
+      font-size: 22px;
+      margin: 0;
       color: #0f172a;
     }
+    .lang-switcher {
+      display: inline-flex;
+      background: #e2e8f0;
+      padding: 3px;
+      border-radius: 8px;
+      gap: 2px;
+      flex-shrink: 0;
+    }
+    .lang-btn {
+      border: none;
+      background: transparent;
+      padding: 4px 12px;
+      font-size: 13px;
+      font-weight: 500;
+      border-radius: 6px;
+      cursor: pointer;
+      color: #475569;
+      transition: all 0.2s ease;
+    }
+    .lang-btn.active {
+      background: #ffffff;
+      color: #1e293b;
+      font-weight: 600;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
     h2 {
-      font-size: 18px;
-      margin-top: 28px;
-      margin-bottom: 12px;
+      font-size: 17px;
+      margin-top: 24px;
+      margin-bottom: 10px;
       color: #1e293b;
     }
     .card {
@@ -48,6 +80,18 @@
       background: #dcfce7;
       color: #15803d;
     }
+    .badge-jwt {
+      background: #f3e8ff;
+      color: #7e22ce;
+    }
+    .badge-img {
+      background: #d1fae5;
+      color: #065f46;
+    }
+    .badge-input {
+      background: #e0f2fe;
+      color: #0369a1;
+    }
     .badge-warning {
       background: #fef9c3;
       color: #854d0e;
@@ -64,7 +108,7 @@
       color: #ffffff;
       border: none;
       padding: 8px 16px;
-      font-size: 14px;
+      font-size: 13.5px;
       font-weight: 500;
       border-radius: 6px;
       cursor: pointer;
@@ -76,62 +120,207 @@
   </style>
 </head>
 <body>
-  <h1>🔍 Base64 Auto Decoder 浏览器插件测试页面</h1>
-
-  <div class="card">
-    <span class="badge badge-success">正向用例：应该被自动解码并显示复制按钮</span>
-    <p>1. 社区常见微信号分享：我的微信是 d3hpZDoxMjM0NTY3ODk= 请添加时备注来意。</p>
-    <p>2. 中文短语解码：5L2g5aW977yM5LiW55WM 这是一句打招呼的话。</p>
-    <p>3. 网址链接分享：项目地址在 aHR0cHM6Ly9naXRodWIuY29t 欢迎大家前往 Star。</p>
-    <p>4. 磁力链接测试：种子资源地址 bWFnbmV0Oj94dD11cm46YnRpaDoxMjM0NTY3ODk= 速度飞快。</p>
-    <p>5. 英文句子与标点：SGVsbG8gV29ybGQh</p>
-    <p>6. 纯数字解压密码：解压密码是 MTIzNDU2 请注意查收。</p>
+  <div class="header-bar">
+    <h1 id="title-text">🔍 Base64 Auto Decoder 浏览器插件测试页面</h1>
+    <div class="lang-switcher">
+      <button type="button" class="lang-btn active" id="btn-lang-zh">🇨🇳 中文</button>
+      <button type="button" class="lang-btn" id="btn-lang-en">🇬🇧 English</button>
+    </div>
   </div>
 
-  <div class="card">
-    <span class="badge badge-warning">反向用例：普通英文与哈希，绝不能被误解码</span>
-    <p>1. 普通英文单词：this is a test for our internationalization platform.</p>
-    <p>2. Git SHA1 / SHA256 哈希值：commit hash: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 (保持原样)</p>
-    <p>3. 普通纯数字：1234567890 (保持原样)</p>
-  </div>
-
-  <div class="card">
-    <h2>⚡ 动态内容加载测试 (MutationObserver)</h2>
-    <p>点击下方按钮，模拟 SPA 翻页或动态加载一条包含 Base64 的新评论：</p>
-    <button class="test-btn" id="btn-add-dynamic">动态插入新内容</button>
-    <div id="dynamic-container" style="margin-top: 12px;"></div>
+  <div id="test-content">
+    <!-- Will be rendered dynamically based on language -->
   </div>
 
   <script>
-    // 动态插入内容事件
-    document.getElementById('btn-add-dynamic').addEventListener('click', () => {
-      const container = document.getElementById('dynamic-container');
-      const p = document.createElement('p');
-      p.className = 'code-box';
-      p.textContent = `[动态加入 ${new Date().toLocaleTimeString()}] 新鲜生成的链接: aHR0cHM6Ly92MmV4LmNvbQ== 以及暗号: 5b+r5LmQ5LiA5aSp`;
-      container.prepend(p);
-    });
+    const I18N_DATA = {
+      zh: {
+        title: '🔍 Base64 Auto Decoder 浏览器插件测试页面',
+        c1_badge: '正向用例：普通 Base64 自动解码',
+        c1_p1: '1. 社区常见微信号分享：我的微信是 d3hpZDoxMjM0NTY3ODk= 请添加时备注来意。',
+        c1_p2: '2. 中文短语解码：5L2g5aW977yM5LiW55WM 这是一句打招呼的话。',
+        c1_p3: '3. 网址链接分享：项目地址在 aHR0cHM6Ly9naXRodWIuY29t 欢迎大家前往 Star。',
+        c1_p4: '4. 磁力链接测试：种子资源地址 bWFnbmV0Oj94dD11cm46YnRpaDoxMjM0NTY3ODk= 速度飞快。',
+        c1_p5: '5. 英文句子与标点：SGVsbG8gV29ybGQh',
+        c1_p6: '6. 纯数字解压密码：解压密码是 MTIzNDU2 请注意查收。',
 
-    // 本地快速预览 Mock 环境（若未安装插件直接双击打开 html，可自动载入 content.js 演示）
+        c2_badge: 'P2 新增：JWT 令牌智能识别 & 悬停 JSON 预览',
+        c2_p1: '测试 JWT 令牌：eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c （悬停可查看格式化 Header 与 Payload）',
+
+        c3_badge: 'P2 新增：Base64 图片识别 & 悬停缩略图预览',
+        c3_p1: '测试高清图片 Data URL (128x128 扩展图标)：data:image/png;base64,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 （悬停可清晰预览 128x128 扩展图标并支持下载/复制）',
+
+        c4_badge: 'P1 新增：输入框右键菜单“原地转换为 Base64”测试',
+        c4_desc: '在下方输入框中选中任意文本，右键点击“转换为 Base64”测试原地替换：',
+        c4_textarea: '选中这段话，右键一键转为 Base64！',
+
+        c5_badge: '反向用例：普通英文与哈希，绝不能被误解码',
+        c5_p1: '1. 普通英文单词：this is a test for our internationalization platform.',
+        c5_p2: '2. Git SHA1 / SHA256 哈希值：commit hash: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 (保持原样)',
+        c5_p3: '3. 普通纯数字：1234567890 (保持原样)',
+
+        c6_title: '⚡ 动态内容加载测试 (MutationObserver)',
+        c6_desc: '点击下方按钮，模拟 SPA 翻页或动态加载一条包含 Base64 的新评论：',
+        c6_btn: '动态插入新内容',
+        c6_dynamic_prefix: '[动态加入',
+        c6_dynamic_text: '新鲜生成的链接: aHR0cHM6Ly92MmV4LmNvbQ== 以及暗号: 5b+r5LmQ5LiA5aSp'
+      },
+      en: {
+        title: '🔍 Base64 Auto Decoder Extension Test Page',
+        c1_badge: 'Positive Cases: Standard Base64 Auto Decode',
+        c1_p1: '1. Community WeChat share: My WeChat is d3hpZDoxMjM0NTY3ODk= please note your intent.',
+        c1_p2: '2. Chinese greeting decode: 5L2g5aW977yM5LiW55WM This is a friendly greeting.',
+        c1_p3: '3. Website URL share: Project repo is at aHR0cHM6Ly9naXRodWIuY29t feel free to Star.',
+        c1_p4: '4. Magnet link test: Torrent address bWFnbmV0Oj94dD11cm46YnRpaDoxMjM0NTY3ODk= blazing fast.',
+        c1_p5: '5. English sentence & punctuation: SGVsbG8gV29ybGQh',
+        c1_p6: '6. Plain numeric password: The unzip password is MTIzNDU2 please keep it safe.',
+
+        c2_badge: 'P2 Feature: JWT Token Smart Detection & Hover JSON Preview',
+        c2_p1: 'Test JWT Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c (Hover to inspect formatted Header & Payload)',
+
+        c3_badge: 'P2 Feature: Base64 Image Detection & Hover Thumbnail Preview',
+        c3_p1: 'Test HD Image Data URL (128x128 icon): data:image/png;base64,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 (Hover to clearly inspect 128x128 extension icon and download/copy)',
+
+        c4_badge: 'P1 Feature: Context Menu "Convert to Base64 in-place" Test',
+        c4_desc: 'Select any text in the input fields below, right-click and choose "Convert to Base64":',
+        c4_textarea: 'Select this sentence, right-click to convert to Base64 in-place!',
+
+        c5_badge: 'Negative Cases: Plain English & Hashes (Must NOT be decoded)',
+        c5_p1: '1. Standard English words: this is a test for our internationalization platform.',
+        c5_p2: '2. Git SHA1 / SHA256 hashes: commit hash: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 (remains untouched)',
+        c5_p3: '3. Pure numeric digits: 1234567890 (remains untouched)',
+
+        c6_title: '⚡ Dynamic Content Loading Test (MutationObserver)',
+        c6_desc: 'Click the button below to simulate SPA pagination or dynamically inserting a new Base64 comment:',
+        c6_btn: 'Insert Dynamic Content',
+        c6_dynamic_prefix: '[Dynamically added',
+        c6_dynamic_text: 'Freshly generated link: aHR0cHM6Ly92MmV4LmNvbQ== and secret: 5b+r5LmQ5LiA5aSp'
+      }
+    };
+
+    let currentLang = localStorage.getItem('b64_test_lang') || (navigator.language.startsWith('zh') ? 'zh' : 'en');
+
+    function renderPage(lang) {
+      currentLang = lang;
+      localStorage.setItem('b64_test_lang', lang);
+
+      document.getElementById('btn-lang-zh').classList.toggle('active', lang === 'zh');
+      document.getElementById('btn-lang-en').classList.toggle('active', lang === 'en');
+      document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+
+      const d = I18N_DATA[lang];
+      document.getElementById('title-text').textContent = d.title;
+
+      const container = document.getElementById('test-content');
+      container.innerHTML = `
+        <div class="card">
+          <span class="badge badge-success">${d.c1_badge}</span>
+          <p>${d.c1_p1}</p>
+          <p>${d.c1_p2}</p>
+          <p>${d.c1_p3}</p>
+          <p>${d.c1_p4}</p>
+          <p>${d.c1_p5}</p>
+          <p>${d.c1_p6}</p>
+        </div>
+
+        <div class="card">
+          <span class="badge badge-jwt">${d.c2_badge}</span>
+          <p>${d.c2_p1}</p>
+        </div>
+
+        <div class="card">
+          <span class="badge badge-img">${d.c3_badge}</span>
+          <p>${d.c3_p1}</p>
+        </div>
+
+        <div class="card">
+          <span class="badge badge-input">${d.c4_badge}</span>
+          <p>${d.c4_desc}</p>
+          <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px;">
+            <input type="text" value="my_secret_email@gmail.com" style="padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px;">
+            <textarea rows="2" style="padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px;">${d.c4_textarea}</textarea>
+          </div>
+        </div>
+
+        <div class="card">
+          <span class="badge badge-warning">${d.c5_badge}</span>
+          <p>${d.c5_p1}</p>
+          <p>${d.c5_p2}</p>
+          <p>${d.c5_p3}</p>
+        </div>
+
+        <div class="card">
+          <h2>${d.c6_title}</h2>
+          <p>${d.c6_desc}</p>
+          <button class="test-btn" id="btn-add-dynamic">${d.c6_btn}</button>
+          <div id="dynamic-container" style="margin-top: 12px;"></div>
+        </div>
+      `;
+
+      // Re-bind dynamic button
+      document.getElementById('btn-add-dynamic').addEventListener('click', () => {
+        const dynContainer = document.getElementById('dynamic-container');
+        const p = document.createElement('p');
+        p.className = 'code-box';
+        p.textContent = `${d.c6_dynamic_prefix} ${new Date().toLocaleTimeString()}] ${d.c6_dynamic_text}`;
+        dynContainer.prepend(p);
+      });
+    }
+
+    document.getElementById('btn-lang-zh').addEventListener('click', () => renderPage('zh'));
+    document.getElementById('btn-lang-en').addEventListener('click', () => renderPage('en'));
+
+    // Initial render
+    renderPage(currentLang);
+
+    // Mock Chrome Extension API for local testing without installation
     if (!window.chrome || !chrome.runtime || !chrome.runtime.id) {
-      console.log('检测到本地直接打开测试页，注入模拟环境运行 content.js...');
+      console.log('Detected local standalone preview; injecting mock environment for content.js...');
+
+      const mockZh = {
+        copyButtonTitle: '复制解码内容',
+        copiedFeedback: '已复制！',
+        originalTitle: '原始 Base64: ',
+        originalBadgeTitle: '原始 Base64',
+        btnCopyOriginal: '复制原始 Base64',
+        jwtBadgeTitle: 'JWT 令牌',
+        btnCopyPayload: '复制 Payload',
+        imageBadgeTitle: 'Base64 图片',
+        btnDownloadImage: '下载图片',
+        btnCopyDataUrl: '复制图片链接'
+      };
+
+      const mockEn = {
+        copyButtonTitle: 'Copy decoded text',
+        copiedFeedback: 'Copied!',
+        originalTitle: 'Original: ',
+        originalBadgeTitle: 'Original Base64',
+        btnCopyOriginal: 'Copy Original Base64',
+        jwtBadgeTitle: 'JWT Token',
+        btnCopyPayload: 'Copy Payload',
+        imageBadgeTitle: 'Base64 Image',
+        btnDownloadImage: 'Download Image',
+        btnCopyDataUrl: 'Copy Image URL'
+      };
+
       window.chrome = {
         i18n: {
           getMessage: (k) => {
-            const msgs = {
-              copyButtonTitle: '复制解码内容',
-              copiedFeedback: '已复制！',
-              originalTitle: '原始 Base64: '
-            };
-            return msgs[k] || '';
+            const table = currentLang === 'en' ? mockEn : mockZh;
+            return table[k] || '';
           }
         },
         storage: {
           sync: {
-            get: (keys, cb) => cb({ enabled: true }),
-            set: (data, cb) => { if(cb) cb(); }
+            get: (keys, cb) => cb({ enabled: true, disabledDomains: [] }),
+            set: (data, cb) => { if (cb) cb(); }
           },
           onChanged: {
+            addListener: () => {}
+          }
+        },
+        runtime: {
+          onMessage: {
             addListener: () => {}
           }
         }

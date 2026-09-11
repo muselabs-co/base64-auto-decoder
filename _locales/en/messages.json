@@ -28,7 +28,7 @@
     "description": "Hint text at the bottom of popup."
   },
   "footerVersion": {
-    "message": "v1.1.0",
+    "message": "v1.2.0",
     "description": "Version text in popup."
   },
   "copyButtonTitle": {
@@ -86,5 +86,85 @@
   "btnUsePlain": {
     "message": "Use Plain",
     "description": "Button to fill input with plain text"
+  },
+  "menuEncodeSelection": {
+    "message": "Encode to Base64",
+    "description": "Context menu to encode selected text to Base64"
+  },
+  "menuDecodeSelection": {
+    "message": "Decode Base64",
+    "description": "Context menu to decode selected Base64 text"
+  },
+  "toastEncoded": {
+    "message": "Encoded to Base64 and copied to clipboard!",
+    "description": "Toast message after encoding"
+  },
+  "toastDecoded": {
+    "message": "Decoded Base64 and copied to clipboard!",
+    "description": "Toast message after decoding"
+  },
+  "toastDecodeFailed": {
+    "message": "Selection is not a valid Base64 string",
+    "description": "Toast message on decode failure"
+  },
+  "siteSettingLabel": {
+    "message": "Current Site",
+    "description": "Label for current site setting card"
+  },
+  "jwtBadgeTitle": {
+    "message": "JWT Token",
+    "description": "JWT badge title"
+  },
+  "jwtHeaderLabel": {
+    "message": "Header",
+    "description": "JWT Header label"
+  },
+  "jwtPayloadLabel": {
+    "message": "Payload",
+    "description": "JWT Payload label"
+  },
+  "btnCopyPayload": {
+    "message": "Copy Payload",
+    "description": "Button to copy JWT payload"
+  },
+  "imageBadgeTitle": {
+    "message": "Base64 Image",
+    "description": "Base64 image badge title"
+  },
+  "btnDownloadImage": {
+    "message": "Download Image",
+    "description": "Button to download image"
+  },
+  "btnCopyDataUrl": {
+    "message": "Copy Image URL",
+    "description": "Button to copy image data url"
+  },
+  "blacklistTitle": {
+    "message": "Blacklist Management",
+    "description": "Title for blacklist management section"
+  },
+  "emptyBlacklist": {
+    "message": "No disabled websites. Auto-decode is active on all sites.",
+    "description": "Text when blacklist is empty"
+  },
+  "btnAddDomain": {
+    "message": "Add",
+    "description": "Button to add domain to blacklist"
+  },
+  "domainPlaceholder": {
+    "message": "Enter domain (e.g. v2ex.com)...",
+    "description": "Placeholder for blacklist domain input"
+  },
+  "btnRemoveDomain": {
+    "message": "Remove from blacklist",
+    "description": "Tooltip for removing domain from blacklist"
+  },
+  "originalBadgeTitle": {
+    "message": "Original Base64",
+    "description": "Title for original base64 popover"
+  },
+  "btnCopyOriginal": {
+    "message": "Copy Original Base64",
+    "description": "Button to copy original base64"
   }
 }

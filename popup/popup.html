@@ -13,22 +13,74 @@
         <img src="../icons/icon48.png" alt="Logo" class="logo">
         <div class="title-wrap">
           <h1 class="title" data-i18n="popupTitle">Base64 Decoder</h1>
-          <span class="badge-version" data-i18n="footerVersion">v1.1.0</span>
+          <span class="badge-version" data-i18n="footerVersion">v1.2.0</span>
         </div>
+      </div>
+      <div class="lang-switch-wrap">
+        <button type="button" class="lang-toggle-btn" id="lang-toggle-btn" title="Switch Language / 切换语言">
+          <span class="lang-option active" id="lang-en">EN</span>
+          <span class="lang-divider">/</span>
+          <span class="lang-option" id="lang-zh">中</span>
+        </button>
       </div>
     </header>
 
     <main class="popup-main">
-      <div class="setting-card">
-        <div class="setting-info">
-          <span class="setting-label" data-i18n="statusLabel">Auto Decode</span>
-          <span class="status-indicator status-enabled" id="status-indicator" data-i18n="statusEnabled">Enabled</span>
+      <!-- Controls Row: Side-by-Side Global & Site Controls -->
+      <div class="controls-row">
+        <!-- Auto Decode Card -->
+        <div class="setting-card" id="auto-decode-card">
+          <div class="card-row card-row-top">
+            <span class="setting-label" data-i18n="statusLabel">Auto Decode</span>
+            <label class="switch" for="toggle-switch">
+              <input type="checkbox" id="toggle-switch" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="card-row card-row-bottom">
+            <span class="status-indicator status-enabled" id="status-indicator" data-i18n="statusEnabled">Enabled</span>
+          </div>
         </div>
-        <label class="switch" for="toggle-switch">
-          <input type="checkbox" id="toggle-switch" checked>
-          <span class="slider"></span>
-        </label>
+
+        <!-- Current Site Setting Card -->
+        <div class="setting-card site-card" id="site-card" style="display: none;">
+          <div class="card-row card-row-top">
+            <span class="setting-label" data-i18n="siteSettingLabel">Current Site</span>
+            <label class="switch" for="site-toggle-switch">
+              <input type="checkbox" id="site-toggle-switch" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="card-row card-row-bottom">
+            <span class="site-domain" id="site-domain">-</span>
+            <span class="status-indicator status-enabled" id="site-status-indicator" data-i18n="statusEnabled">Enabled</span>
+          </div>
+        </div>
       </div>
+
+      <!-- Blacklist Management Section -->
+      <section class="blacklist-section" id="blacklist-section">
+        <div class="section-header blacklist-header" id="blacklist-header">
+          <div class="blacklist-title-wrap">
+            <span class="section-title" data-i18n="blacklistTitle">网站黑名单管理</span>
+            <span class="snippet-count" id="blacklist-count">0</span>
+          </div>
+          <svg class="chevron-icon" id="blacklist-chevron" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+          </svg>
+        </div>
+        <div class="blacklist-body" id="blacklist-body">
+          <form id="add-blacklist-form" class="snippet-form">
+            <div class="form-row form-row-inline">
+              <input type="text" id="input-domain" class="input-field" placeholder="输入域名 (如 v2ex.com)..." data-i18n-placeholder="domainPlaceholder" autocomplete="off">
+              <button type="submit" id="btn-add-domain" class="btn-primary" data-i18n="btnAddDomain">添加</button>
+            </div>
+          </form>
+          <div id="blacklist-list" class="blacklist-list">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </section>
 
       <!-- Quick Base64 Section -->
       <section class="snippets-section">
