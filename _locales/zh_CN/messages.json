@@ -28,7 +28,7 @@
     "description": "弹窗底部提示"
   },
   "footerVersion": {
-    "message": "v1.2.0",
+    "message": "v1.2.1",
     "description": "版本号"
   },
   "copyButtonTitle": {
@@ -126,6 +126,38 @@
   "btnCopyPayload": {
     "message": "复制 Payload",
     "description": "复制 JWT Payload 按钮"
+  },
+  "btnCopyToken": {
+    "message": "复制原始 Token",
+    "description": "复制原始 JWT Token 按钮"
+  },
+  "jwtStatusActive": {
+    "message": "有效中",
+    "description": "JWT 有效状态"
+  },
+  "jwtStatusExpired": {
+    "message": "已过期",
+    "description": "JWT 已过期状态"
+  },
+  "jwtStatusNoExp": {
+    "message": "无过期时间",
+    "description": "JWT 无过期时间"
+  },
+  "jwtLabelAlg": {
+    "message": "算法",
+    "description": "JWT 算法标签"
+  },
+  "jwtLabelSub": {
+    "message": "主体",
+    "description": "JWT 主体标签"
+  },
+  "jwtLabelExp": {
+    "message": "到期",
+    "description": "JWT 到期标签"
+  },
+  "jwtLabelIat": {
+    "message": "签发",
+    "description": "JWT 签发标签"
   },
   "imageBadgeTitle": {
     "message": "Base64 图片",

@@ -20,6 +20,14 @@
     toastDecodeFailed: chrome.i18n.getMessage('toastDecodeFailed') || 'Selection is not a valid Base64 string',
     jwtBadgeTitle: chrome.i18n.getMessage('jwtBadgeTitle') || 'JWT Token',
     btnCopyPayload: chrome.i18n.getMessage('btnCopyPayload') || 'Copy Payload',
+    btnCopyToken: chrome.i18n.getMessage('btnCopyToken') || 'Copy Token',
+    jwtStatusActive: chrome.i18n.getMessage('jwtStatusActive') || 'Active',
+    jwtStatusExpired: chrome.i18n.getMessage('jwtStatusExpired') || 'Expired',
+    jwtStatusNoExp: chrome.i18n.getMessage('jwtStatusNoExp') || 'No Expiry',
+    jwtLabelAlg: chrome.i18n.getMessage('jwtLabelAlg') || 'Algorithm',
+    jwtLabelSub: chrome.i18n.getMessage('jwtLabelSub') || 'Subject',
+    jwtLabelExp: chrome.i18n.getMessage('jwtLabelExp') || 'Expires',
+    jwtLabelIat: chrome.i18n.getMessage('jwtLabelIat') || 'Issued',
     imageBadgeTitle: chrome.i18n.getMessage('imageBadgeTitle') || 'Base64 Image',
     btnDownloadImage: chrome.i18n.getMessage('btnDownloadImage') || 'Download Image',
     btnCopyDataUrl: chrome.i18n.getMessage('btnCopyDataUrl') || 'Copy Image URL',
@@ -134,6 +142,133 @@
   }
 
   /**
+   * Helper to format duration into human-readable compact string
+   */
+  /**
+   * Determine if UI should be in Chinese
+   */
+  function isChineseUi() {
+    if (i18n.jwtStatusActive === '有效中') return true;
+    if (typeof chrome !== 'undefined' && chrome.i18n && chrome.i18n.getUILanguage) {
+      return chrome.i18n.getUILanguage().startsWith('zh');
+    }
+    if (typeof navigator !== 'undefined' && navigator.language) {
+      return navigator.language.startsWith('zh');
+    }
+    return false;
+  }
+
+  /**
+   * Helper to format duration into human-readable compact string
+   */
+  function formatDuration(sec) {
+    sec = Math.max(0, Math.floor(sec));
+    const isZh = isChineseUi();
+    if (sec < 60) {
+      return isZh ? `${sec}秒` : `${sec}s`;
+    }
+    const mins = Math.floor(sec / 60);
+    if (mins < 60) {
+      return isZh ? `${mins}分钟` : `${mins}m`;
+    }
+    const hours = Math.floor(mins / 60);
+    const remMins = mins % 60;
+    if (hours < 24) {
+      if (remMins === 0) return isZh ? `${hours}小时` : `${hours}h`;
+      return isZh ? `${hours}小时${remMins}分` : `${hours}h ${remMins}m`;
+    }
+    const days = Math.floor(hours / 24);
+    const remHours = hours % 24;
+    if (remHours === 0) return isZh ? `${days}天` : `${days}d`;
+    return isZh ? `${days}天${remHours}小时` : `${days}d ${remHours}h`;
+  }
+
+  /**
+   * Convert value to valid positive number timestamp, supporting string numbers
+   */
+  function toValidTimestamp(v) {
+    if (v === undefined || v === null || v === '') return null;
+    const num = Number(v);
+    return (!isNaN(num) && num > 0) ? num : null;
+  }
+
+  /**
+   * Helper to format Unix timestamp (seconds or milliseconds) to readable local time string
+   */
+  function formatTimestamp(ts) {
+    const validTs = toValidTimestamp(ts);
+    if (!validTs) return null;
+    const ms = validTs > 1e11 ? validTs : validTs * 1000;
+    try {
+      const d = new Date(ms);
+      if (isNaN(d.getTime())) return null;
+      const pad = (n) => String(n).padStart(2, '0');
+      const Y = d.getFullYear();
+      const M = pad(d.getMonth() + 1);
+      const D = pad(d.getDate());
+      const h = pad(d.getHours());
+      const m = pad(d.getMinutes());
+      const s = pad(d.getSeconds());
+      return `${Y}-${M}-${D} ${h}:${m}:${s}`;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /**
+   * Parse and calculate JWT expiration status and relative timings
+   */
+  function parseJwtStatus(payload) {
+    if (!payload || typeof payload !== 'object') {
+      return { status: 'no_exp', label: i18n.jwtStatusNoExp, isExpired: false, expTimeStr: null, iatTimeStr: null, relativeStr: '' };
+    }
+
+    const isZh = isChineseUi();
+    const exp = toValidTimestamp(payload.exp);
+    const iat = toValidTimestamp(payload.iat);
+    const expTimeStr = exp ? formatTimestamp(exp) : null;
+    const iatTimeStr = iat ? formatTimestamp(iat) : null;
+
+    if (exp === null) {
+      return {
+        status: 'no_exp',
+        label: i18n.jwtStatusNoExp,
+        isExpired: false,
+        expTimeStr: null,
+        iatTimeStr,
+        relativeStr: isZh ? '无过期时间' : 'No Expiry'
+      };
+    }
+
+    const nowSec = Date.now() / 1000;
+    const expSec = exp > 1e11 ? exp / 1000 : exp;
+
+    if (nowSec > expSec) {
+      const diff = nowSec - expSec;
+      const duration = formatDuration(diff);
+      return {
+        status: 'expired',
+        label: i18n.jwtStatusExpired,
+        isExpired: true,
+        expTimeStr,
+        iatTimeStr,
+        relativeStr: isZh ? `已过期 ${duration}` : `Expired ${duration} ago`
+      };
+    } else {
+      const diff = expSec - nowSec;
+      const duration = formatDuration(diff);
+      return {
+        status: 'active',
+        label: i18n.jwtStatusActive,
+        isExpired: false,
+        expTimeStr,
+        iatTimeStr,
+        relativeStr: isZh ? `还剩 ${duration} 到期` : `Expires in ${duration}`
+      };
+    }
+  }
+
+  /**
    * Detect and parse JWT token
    */
   function tryParseJWT(token) {
@@ -160,11 +295,14 @@
         return null;
       }
 
+      const statusInfo = parseJwtStatus(payloadObj);
+
       return {
         header: headerObj,
         payload: payloadObj,
         headerRaw: JSON.stringify(headerObj, null, 2),
         payloadRaw: JSON.stringify(payloadObj, null, 2),
+        statusInfo: statusInfo,
         raw: token.trim()
       };
     } catch (e) {
@@ -260,29 +398,67 @@
    */
   function createJwtElement(token, jwtInfo) {
     const wrapper = document.createElement('span');
-    wrapper.className = 'b64-decoded-wrapper b64-jwt-wrapper b64-has-popover';
+    const statusClass = jwtInfo.statusInfo.status === 'expired' ? 'b64-jwt-expired' : (jwtInfo.statusInfo.status === 'active' ? 'b64-jwt-active' : '');
+    wrapper.className = `b64-decoded-wrapper b64-jwt-wrapper b64-has-popover ${statusClass}`;
     wrapper.setAttribute('data-b64-original', token);
 
     const tagSpan = document.createElement('span');
-    tagSpan.className = 'b64-badge-tag b64-jwt-tag';
-    tagSpan.textContent = 'JWT';
+    tagSpan.className = `b64-badge-tag b64-jwt-tag ${statusClass}`;
+    const statusDot = jwtInfo.statusInfo.status === 'expired' ? '🔴' : (jwtInfo.statusInfo.status === 'active' ? '🟢' : '⚪');
+    tagSpan.textContent = `JWT ${statusDot}`;
 
     const textSpan = document.createElement('span');
     textSpan.className = 'b64-decoded-text';
-    const sub = jwtInfo.payload.sub || jwtInfo.payload.name || jwtInfo.header.alg || 'Token';
+    const sub = jwtInfo.payload.sub || jwtInfo.payload.name || jwtInfo.payload.email || jwtInfo.header.alg || 'Token';
     textSpan.textContent = `⚡ ${sub}`;
 
     // Popover Card
     const popover = document.createElement('div');
-    popover.className = 'b64-popover-card';
+    popover.className = 'b64-popover-card b64-jwt-popover';
+
+    const statusPillClass = jwtInfo.statusInfo.status === 'expired' ? 'pill-expired' : (jwtInfo.statusInfo.status === 'active' ? 'pill-active' : 'pill-neutral');
+
+    let metaHtml = `
+      <div class="b64-jwt-meta-grid">
+        <div class="meta-row">
+          <span class="meta-label">${i18n.jwtLabelAlg}:</span>
+          <span class="meta-val font-mono">${escapeHTML(jwtInfo.header.alg || 'JWT')}</span>
+        </div>
+        ${jwtInfo.payload.sub ? `
+        <div class="meta-row">
+          <span class="meta-label">${i18n.jwtLabelSub}:</span>
+          <span class="meta-val font-mono">${escapeHTML(String(jwtInfo.payload.sub))}</span>
+        </div>` : ''}
+        ${jwtInfo.statusInfo.expTimeStr ? `
+        <div class="meta-row">
+          <span class="meta-label">${i18n.jwtLabelExp}:</span>
+          <span class="meta-val font-mono">${escapeHTML(jwtInfo.statusInfo.expTimeStr)}</span>
+        </div>` : ''}
+        ${jwtInfo.statusInfo.iatTimeStr ? `
+        <div class="meta-row">
+          <span class="meta-label">${i18n.jwtLabelIat}:</span>
+          <span class="meta-val font-mono">${escapeHTML(jwtInfo.statusInfo.iatTimeStr)}</span>
+        </div>` : ''}
+      </div>
+    `;
+
     popover.innerHTML = `
       <div class="b64-popover-header">
-        <span class="b64-popover-title">${i18n.jwtBadgeTitle}</span>
-        <span>${escapeHTML(jwtInfo.header.alg || 'JWT')}</span>
+        <div class="b64-jwt-title-wrap">
+          <span class="b64-popover-title">${i18n.jwtBadgeTitle}</span>
+        </div>
+        <div class="b64-jwt-status-pill ${statusPillClass}">
+          <span class="status-dot"></span>
+          <span class="status-text">${escapeHTML(jwtInfo.statusInfo.relativeStr || jwtInfo.statusInfo.label)}</span>
+        </div>
+      </div>
+      <div class="b64-jwt-meta-box">
+        ${metaHtml}
       </div>
       <div class="b64-popover-code">${escapeHTML(jwtInfo.payloadRaw)}</div>
       <div class="b64-popover-actions">
         <button type="button" class="b64-popover-btn btn-copy-payload">${i18n.btnCopyPayload}</button>
+        <button type="button" class="b64-popover-btn btn-copy-token">${i18n.btnCopyToken}</button>
       </div>
     `;
 
@@ -582,7 +758,8 @@
       if (!wrapper) return;
       const original = wrapper.getAttribute('data-b64-original');
       const textSpan = wrapper.querySelector('.b64-decoded-text');
-      const textToCopy = textSpan ? textSpan.textContent : original;
+      const isJwt = wrapper.classList.contains('b64-jwt-wrapper');
+      const textToCopy = isJwt ? original : (textSpan ? textSpan.textContent : original);
 
       const doSuccess = () => {
         copyBtn.classList.add('b64-copied');
@@ -605,6 +782,25 @@
       if (codeElem) {
         navigator.clipboard.writeText(codeElem.textContent).then(() => {
           showGlobalToast(i18n.copiedFeedback);
+        }).catch(() => {
+          fallbackCopy(codeElem.textContent, () => showGlobalToast(i18n.copiedFeedback));
+        });
+      }
+      return;
+    }
+
+    // 2.1 JWT Popover: Copy Raw Token
+    const jwtTokenBtn = e.target.closest('.btn-copy-token');
+    if (jwtTokenBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+      const wrapper = jwtTokenBtn.closest('.b64-decoded-wrapper');
+      const original = wrapper ? wrapper.getAttribute('data-b64-original') : '';
+      if (original) {
+        navigator.clipboard.writeText(original).then(() => {
+          showGlobalToast(i18n.copiedFeedback);
+        }).catch(() => {
+          fallbackCopy(original, () => showGlobalToast(i18n.copiedFeedback));
         });
       }
       return;
@@ -648,14 +844,17 @@
     const card = target.querySelector('.b64-popover-card');
     if (!card) return;
     const rect = target.getBoundingClientRect();
-    if (rect.left + 300 > window.innerWidth) {
+    const cardWidth = card.offsetWidth || 340;
+    const cardHeight = card.offsetHeight || 280;
+
+    if (rect.left + cardWidth > window.innerWidth) {
       card.style.left = 'auto';
       card.style.right = '0';
     } else {
       card.style.left = '0';
       card.style.right = 'auto';
     }
-    if (rect.bottom + 220 > window.innerHeight && rect.top > 220) {
+    if (rect.bottom + cardHeight > window.innerHeight && rect.top > cardHeight) {
       card.style.top = 'auto';
       card.style.bottom = 'calc(100% + 6px)';
       card.classList.add('popover-top');

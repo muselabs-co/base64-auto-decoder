@@ -30,10 +30,11 @@ A lightweight, zero-dependency, pure vanilla, and high-precision Chrome Extensio
   - Re-engineered top control area with dual-column side-by-side cards ("Auto Decode" + "Current Site") and ultra-compact 34×18 switches, reducing header height by 45%.
 - **Popup Dual-Language Switcher (New in v1.2.0)**:
   - Built-in `[ EN / 中 ]` header switcher. Defaults to English (`en`) and instantly translates all popup UI elements without reloading.
-- **JWT (JSON Web Token) Smart Parser (New in v1.2.0)**:
-  - Automatically identifies 3-part JWT tokens in webpages, marked with an exclusive purple `[JWT]` badge.
-  - Hover reveals a structured JSON card displaying formatted Header and Payload with one-click "Copy Payload".
-  - Popup Smart Decoder also detects and pretty-prints pasted JWT tokens.
+- **JWT (JSON Web Token) Smart Parser & Expiration Awareness (Enhanced in v1.2.1)**:
+  - Automatically identifies 3-part JWT tokens in webpages with in-place status indicators (`[JWT 🟢]` Active / `[JWT 🔴]` Expired / `[JWT ⚪]` No Expiry).
+  - Intelligently compares local current time against `exp`/`iat` timestamps, computing exact remaining duration or elapsed expired time (e.g. `Expires in 25m` / `Expired 2h ago`).
+  - Hover reveals a structured JSON card displaying algorithm, subject, formatted local expiration/issued timestamps, and Payload JSON with one-click "Copy Payload".
+  - Popup Smart Decoder also detects pasted JWT tokens, showing expiration status countdown, metadata, and pretty-printed Payload.
 - **Base64 Image Hover Preview (New in v1.2.0)**:
   - Recognizes `data:image/...` and raw image Base64 strings (PNG, JPEG, GIF, WEBP), displaying a green `[IMG]` badge.
   - Hover reveals an interactive preview popover with image thumbnail, dimensions, and quick "Download" & "Copy URL" buttons.
@@ -73,7 +74,7 @@ base64-decoder/
 ## 🚀 Installation & Usage
 
 ### Method 1: Download from GitHub Releases (Recommended)
-1. Download `base64-decoder-v1.2.0.zip` from the [Releases](https://github.com/muselabs-co/base64-auto-decoder/releases) page.
+1. Download `base64-decoder-v1.2.1.zip` from the [Releases](https://github.com/muselabs-co/base64-auto-decoder/releases) page.
 2. Extract the zip archive to a local folder.
 3. Open Google Chrome and navigate to `chrome://extensions/`.
 4. Enable **Developer mode** in the top-right corner.
@@ -91,7 +92,7 @@ base64-decoder/
 ## 🧪 Testing
 
 - **In-Browser Test**:
-  Open `test/test_page.html` in Chrome after installing the extension to inspect automatic in-place decoding, JWT formatting, image hover preview, and context menus. Use the top-right `[ 🇨🇳 中文 | 🇬🇧 English ]` button to toggle test page language.
+  Open `test/test_page.html` in Chrome after installing the extension to inspect automatic in-place decoding, JWT formatting, image hover preview, and context menus. Use the top-right `[ 中文 | English ]` button to toggle test page language.
 - **Command-Line Unit Test**:
   Run unit test in the project root:
   ```bash

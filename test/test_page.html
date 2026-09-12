@@ -123,8 +123,8 @@
   <div class="header-bar">
     <h1 id="title-text">🔍 Base64 Auto Decoder 浏览器插件测试页面</h1>
     <div class="lang-switcher">
-      <button type="button" class="lang-btn active" id="btn-lang-zh">🇨🇳 中文</button>
-      <button type="button" class="lang-btn" id="btn-lang-en">🇬🇧 English</button>
+      <button type="button" class="lang-btn active" id="btn-lang-zh">中文</button>
+      <button type="button" class="lang-btn" id="btn-lang-en">English</button>
     </div>
   </div>
 
@@ -144,8 +144,10 @@
         c1_p5: '5. 英文句子与标点：SGVsbG8gV29ybGQh',
         c1_p6: '6. 纯数字解压密码：解压密码是 MTIzNDU2 请注意查收。',
 
-        c2_badge: 'P2 新增：JWT 令牌智能识别 & 悬停 JSON 预览',
-        c2_p1: '测试 JWT 令牌：eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c （悬停可查看格式化 Header 与 Payload）',
+        c2_badge: 'v1.2.1 新增：JWT 令牌智能识别 & 有效性状态与悬停预览',
+        c2_p1: '1. 有效状态 JWT（🟢 未到期，2050年到期）：eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbl9hY3RpdmUiLCJuYW1lIjoiQWxpY2UiLCJleHAiOjI1MjQ2MDgwMDAsImlhdCI6MTcwMDAwMDAwMH0.fake_signature_abc123 （悬停查看有效中倒计时与本地标准时间）',
+        c2_p2: '2. 已过期 JWT（🔴 已过期，2020年过期）：eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyX2V4cGlyZWQiLCJuYW1lIjoiQm9iIiwiZXhwIjoxNTc3ODM2ODAwLCJpYXQiOjE1Nzc4MzMyMDB9.fake_signature_xyz789 （悬停查看已过期时长）',
+        c2_p3: '3. 永不过期 JWT（⚪ 无 exp 字段）：eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
 
         c3_badge: 'P2 新增：Base64 图片识别 & 悬停缩略图预览',
         c3_p1: '测试高清图片 Data URL (128x128 扩展图标)：data:image/png;base64,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 （悬停可清晰预览 128x128 扩展图标并支持下载/复制）',
@@ -175,8 +177,10 @@
         c1_p5: '5. English sentence & punctuation: SGVsbG8gV29ybGQh',
         c1_p6: '6. Plain numeric password: The unzip password is MTIzNDU2 please keep it safe.',
 
-        c2_badge: 'P2 Feature: JWT Token Smart Detection & Hover JSON Preview',
-        c2_p1: 'Test JWT Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c (Hover to inspect formatted Header & Payload)',
+        c2_badge: 'v1.2.1 Feature: JWT Token Smart Detection, Expiration Status & Hover Preview',
+        c2_p1: '1. Active JWT (🟢 Valid, expires in 2050): eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbl9hY3RpdmUiLCJuYW1lIjoiQWxpY2UiLCJleHAiOjI1MjQ2MDgwMDAsImlhdCI6MTcwMDAwMDAwMH0.fake_signature_abc123 (Hover to inspect active countdown and formatted local time)',
+        c2_p2: '2. Expired JWT (🔴 Expired in 2020): eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyX2V4cGlyZWQiLCJuYW1lIjoiQm9iIiwiZXhwIjoxNTc3ODM2ODAwLCJpYXQiOjE1Nzc4MzMyMDB9.fake_signature_xyz789 (Hover to inspect expired duration)',
+        c2_p3: '3. Permanent JWT (⚪ No exp field): eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
 
         c3_badge: 'P2 Feature: Base64 Image Detection & Hover Thumbnail Preview',
         c3_p1: 'Test HD Image Data URL (128x128 icon): data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAALa0lEQVR42u3dy3IaxwLGcZZ+CC20UZITX+VYOkmWegOXdl5ICwj3i8DcYQJ+D72CHkFvodJaK21kwAa80WbOx/TpmekPokADYmC6q37LoGG+/0xZVXE5ElnjOWj39uDkoNU7gxJY0DlokobUF+qkRqrSwFMhZfL5m6pEiuTiu6pA8n5DIUeyJCONhDRJOSwowdlBcnQCe5FtOQfW133IHLS/XsE9xrcdLdIkDakv1EmNVKWBp0LK5PM3VYkUycV3VYHk/YZCjmRJRhoJaZIiSWl8D1cHiXEG9oM4/Dlcg+1oSyaAFQUgJFzXcL754f/+egF37vAmgOcKQIiP7+BiE8Ofwi3YDhPApgKQbuF0/cN3Hl5g8Et3eBNAUAKQLg/++vFiLeP/1Hk4hpufMPgUi7SlntAiTdKQ+kKd1EhVGngqpEwwuqJEigSjKwok7zcUciRLMtJISJMUSUpjIUHiM/z14waOVz3+R3gE2wQQ+AAmHuHjqsb/5AwvmQC2IQDp03Ljd50n3zYBbG0A9k8xzTcBxj+GRxPA1gfwCMeLjv8CbsA2AWx9ABM3MP9vBz93Hy7BdnQIBp9ikbbUE1qkSRpSX6iTGqlKA0+FlAlGV5RIkWB0RYHk/YZCjmRJRhoJaZIiSWksJEh8BoyuiLku5x3/1B3fBLBLAUyczhPArQlgZwO4fXr8Lw8XyvgmgF0LwP45+uPiqQDuTAA7H8DdzPF/+fJwDvYvXdIhGHyKRdpST2iRJmlIfaFOaqQqDTwVUiYYXVEiRYLRFQWS9xsKOZIlGWkkpEmKJKWxkCDxGTC6IkaijvNZAVybAEITwDWPv++MbwIISwAT+/4AMiaA0AWQ8QdwZQIIXQBX/gDuTQChC+DeGf8/Xx72wHZ1SYdg8CkWaUs9oUWapCH1hTqpkao08FRImWB0RYkUCUZXFEjebyjkSJZkpJGQJimSlMZCgsRnwOiKGIkq9iYBnJgAQhvAySSAMxNAaAM4mwRQMgGENoDSJADLBBDaAKxJAJ0gB/DUCUoAT15jsAPoRH5FAGC7uqRDMPgUi7SlntAiTdKQ+kJdmOf8ivEdFVImGF1RIkWC0RUFkhfmukaM78hIIyFNUiQpjYUEic+A0RUxElUEN4BFzqYCWOgaTQDbEcC6jglggQAWvrlbEIBznSYAE4AJ4F8C0LqxKwrgOU7gAniJAMB2dUmHYPApFmlLPaFFmqQh6QXwEgG8rJAyweiKEnmmAF4igJcY35EmKZKUxkKCxGfA6IoYiSqCFYD2+BsK4OWCvwl4EZgApgLQfqJWFIDWz9YMwI3ABLBcAO74GwhgMr5kAlgygKWf/i0MwPkME4B+AC+r/ZUFoPv69wy3N4BXCABsV5d0CAafYpG21BNapOnROa8wvjDwVEiZYHRFybPwzy98t1/l/YYOre+C4V0pkpTGQoLEZ8DoihiJKjYbgO7ZpQCUCEwAc9ysWj+wAbzKDU0A8wag/bSsOACt8VccgBuBCWCO8QMewFJvgbAEsNT4WxCAdgSbCOA1AgDb1SUdgsGnWKQt9YSWSue8xvCuqjTwVEiZYHSFxvivMbwr7zcUch6t74jRFUlpLCRIfAaMroiRqOL5A1h6/C0JYCUR7FoAuidMASgRmABwM+r9tQSw1PhzBvA6OzQByAC0n4YQBuBG8BwBvEEAYLu6pEMw+BSLtKWeoBnAG4zvqJGqNPBUSJlgdL+FrwWjK/J+QyFHsoLWd0cAb5LSWEiQ+AwYXREjUcXzBLDU+GsIYOFrufi+VADaEexCALrHBOCPIGQBKOPvSADLvQW2NICVPP0rDkBr/A0GICIIUQBvGv2dDeBNZhi8AN4iALBdXdIhGHyKRTTHf4vxHXVSI1Vp4KmQMsH4bzUCeIvxHQWS9xsKOZIlGUHr3iCAtwkSnwGjK2IkqghXANrjmwAWC0Bv/F5oAnibGendo20IQPeYADQi2JUAxPjrDUDrutYYwEreAiaA9QWgjL/LAbxDAGC7uqRDMPgUy6Nz3mF8oS/USY1UpYGnQsqqha8JoysKJO83FHIkSzLSyKF1rzC8Kz4DRlfESFQRjgC0rskE8HwBeBEEI4B3xW9rD0D7PgU9gOXeAiaAuccPcgDv2roRhCMArXuTHJsAdALQGj9MARwiALBdXdIhGHyKRdqCzjlEAId1UiNVaeCpkLKw8M/H+A6MriiQvN9QyJEs0Rz/EOM7EiQ+A0ZXxEhUEbwAnC+8owFo349tDeBQ838IWVUA2uMHKIDD5Ch8AUxFsAMB6D/9Wx7ASt4CIQ1AjL8DARy2loxAI4Clxl9xAFrfPTV6ngDeIwCwXV3SIRh8ikXaUk9Y4i+GvEcA72ukKg08FdXCPwejKzC6okDyfkMhR5Z49b9HAO+T0lhIkPgMGF0RI1HF8wWgG0EYA3DGNwH4bsiCASz8+aVvawlgqad/FwPQfguEKAB3/F0NYCURbEEAS4//XAH8hgDAdnVJh2DwKRZpSz2hpdI5v2F4V1UaeCrCwp+L8R1FgtEVBZL3Gwo5j9Z3xOiKpDQWEiQ+A0ZXxEhUsZkAfmsuGUHAA9D6bumRCWDuCAIcgPb3ClsAS70F/iEA7fE3HIAzvglggRsW0ACWevrDGID2W2CHAnDH31QAHxAA2K4u6RAMPsUibakntEhTpXM+IIAPGF7S+gwM7yoSjK4okLyf3vgfMLoiRZLSWEiQ+AwYXREjUcX2BiAi0A9AGX/JALSv3wTwf41e6AL4kBmZAJYNQEaw9Ot/iQC0r9sEoAawzFtg4f/m87eNBuCMbwKYDuCD5j8cuakA9MYfBiuAIwQAtqtLOgSDT7FIW+oJLdIkDel5AjhCAEclUiQYXVEgmgEcIYAjjO9IkxRJSmMhQeIzYHRFjEQVwQtg3RE4428oADG+CcAEYAJ4OoCjen/nAjjKDk0A6wrgCL8JHFVImcjhTQDbEcC8ETjjbyiAeSNwxg9qAMcIAGxXl3QIBp9ikbbUE1qkSRpSX6h7njrHGN5VIWWC0RUlUiQYXVEgec+T14jhXRlpJKRJiiSlsZAg8RkwuiJGogonACvIAThqpCoFI4Dj/FDIkeww6AFYkwBKJoDQBlCaBHBmAghtAGeTAE5MAKEN4GQSwJ4JILQB7EUm579fHu7BdnRJh2DwKRZpSz2hRZqkIfWFOqmRqjTwVEiZYHRFiRQJRlcUSN5vKORIlmSkkZAmKZKUxkKCxGfA6IoYibruI/Jg+CsTQOgCuPIHkDEBhC6AjD+AfRNA6ALYj/gPxr82AYQmgOsIH4x/bgIITQDnkVnn9y8Pd79jdEWHYPApFmlLPaFFmqQh9YU6qZGqNPBUSJlgdEWJFAlGVxRI3m8o5EiWZKSRkCYpkpTGQoLEZ8DoihiJ/riL/NNBABcmgJ0P4CLy1MHotyaAnQ3gNvJvB6OfmgB2NoDTyDwHw1+aAHYugMvIvOeP7sMLuAH7jw7B4FMs0pZ6Qos0SUPqC3VSI1Vp4KmQMsHoihIpEoyuKJC831DIkSzJSCMhTVIkKY2FBInPgNEVMccNvIgscjD+MTyaALY+gEc4jugcBPDRBLD1AXyMLHMw+icTwNYG8CmyioPhJ2+CRxPA1gTwCB8jqzwY/xhuTACBD+AGjiPrOH92Hl78+ffXS7AVFmlLPaFFmqQh9YU6qZGqNPBUSJlgdEWJFAlGVxRI3m8o5EiWZKSRkCYpkpTGQoLEp1z++deCf9rXCuHvr6dwawIITAC3cBp57oPxL+DOBLCxAO7gIrLpg9HP4doE8GwBXMN5JGgH4+9DBuNfwb0JYGUB3MMVRs/AfmRbDsbfgxOMfgYlsKCD0VUNqS/USY1UpYGnQsrk8zdViRTJxXdVgeT9hkKOZElGGglpknJYUIIzjH8Ce+vc6H8TwBHoT5NX0gAAAABJRU5ErkJggg== (Hover to clearly inspect 128x128 extension icon and download/copy)',
@@ -226,6 +230,8 @@
         <div class="card">
           <span class="badge badge-jwt">${d.c2_badge}</span>
           <p>${d.c2_p1}</p>
+          <p>${d.c2_p2}</p>
+          <p>${d.c2_p3}</p>
         </div>
 
         <div class="card">
@@ -285,6 +291,14 @@
         btnCopyOriginal: '复制原始 Base64',
         jwtBadgeTitle: 'JWT 令牌',
         btnCopyPayload: '复制 Payload',
+        btnCopyToken: '复制原始 Token',
+        jwtStatusActive: '有效中',
+        jwtStatusExpired: '已过期',
+        jwtStatusNoExp: '无过期时间',
+        jwtLabelAlg: '算法',
+        jwtLabelSub: '主体',
+        jwtLabelExp: '到期',
+        jwtLabelIat: '签发',
         imageBadgeTitle: 'Base64 图片',
         btnDownloadImage: '下载图片',
         btnCopyDataUrl: '复制图片链接'
@@ -298,6 +312,14 @@
         btnCopyOriginal: 'Copy Original Base64',
         jwtBadgeTitle: 'JWT Token',
         btnCopyPayload: 'Copy Payload',
+        btnCopyToken: 'Copy Token',
+        jwtStatusActive: 'Active',
+        jwtStatusExpired: 'Expired',
+        jwtStatusNoExp: 'No Expiry',
+        jwtLabelAlg: 'Algorithm',
+        jwtLabelSub: 'Subject',
+        jwtLabelExp: 'Expires',
+        jwtLabelIat: 'Issued At',
         imageBadgeTitle: 'Base64 Image',
         btnDownloadImage: 'Download Image',
         btnCopyDataUrl: 'Copy Image URL'

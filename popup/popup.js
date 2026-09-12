@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const MESSAGES = {
     en: {
       popupTitle: 'Base64 Decoder',
-      footerVersion: 'v1.2.0',
+      footerVersion: 'v1.2.1',
       statusLabel: 'Auto Decode',
       statusEnabled: 'Enabled',
       statusDisabled: 'Disabled',
@@ -46,11 +46,18 @@ document.addEventListener('DOMContentLoaded', () => {
       btnCopyPlain: 'Copy Text',
       btnUsePlain: 'Use Plain',
       btnCopyPayload: 'Copy Payload',
+      jwtStatusActive: 'Active',
+      jwtStatusExpired: 'Expired',
+      jwtStatusNoExp: 'No Expiry',
+      jwtLabelAlg: 'Algorithm',
+      jwtLabelSub: 'Subject',
+      jwtLabelExp: 'Expires',
+      jwtLabelIat: 'Issued At',
       tipSync: 'Status syncs across open tabs automatically.'
     },
     zh_CN: {
       popupTitle: 'Base64 自动解码',
-      footerVersion: 'v1.2.0',
+      footerVersion: 'v1.2.1',
       statusLabel: '自动解码',
       statusEnabled: '已开启',
       statusDisabled: '已关闭',
@@ -72,6 +79,13 @@ document.addEventListener('DOMContentLoaded', () => {
       btnCopyPlain: '复制明文',
       btnUsePlain: '设为明文',
       btnCopyPayload: '复制 Payload',
+      jwtStatusActive: '有效中',
+      jwtStatusExpired: '已过期',
+      jwtStatusNoExp: '无过期时间',
+      jwtLabelAlg: '算法',
+      jwtLabelSub: '主体',
+      jwtLabelExp: '到期',
+      jwtLabelIat: '签发',
       tipSync: '开关状态会自动同步至已打开的网页。'
     }
   };
@@ -129,6 +143,11 @@ document.addEventListener('DOMContentLoaded', () => {
       renderBlacklist(res.disabledDomains || []);
       renderSnippets(res.snippets || []);
     });
+
+    const inputElem = document.getElementById('input-text');
+    if (inputElem && inputElem.value) {
+      inputElem.dispatchEvent(new Event('input'));
+    }
   }
 
   const langToggleBtn = document.getElementById('lang-toggle-btn');
@@ -343,6 +362,116 @@ document.addEventListener('DOMContentLoaded', () => {
     return btoa(binString);
   }
 
+  /**
+   * Helper to format duration into human-readable compact string
+   */
+  function formatDuration(sec) {
+    sec = Math.max(0, Math.floor(sec));
+    const isZh = currentLang === 'zh_CN';
+    if (sec < 60) {
+      return isZh ? `${sec}秒` : `${sec}s`;
+    }
+    const mins = Math.floor(sec / 60);
+    if (mins < 60) {
+      return isZh ? `${mins}分钟` : `${mins}m`;
+    }
+    const hours = Math.floor(mins / 60);
+    const remMins = mins % 60;
+    if (hours < 24) {
+      if (remMins === 0) return isZh ? `${hours}小时` : `${hours}h`;
+      return isZh ? `${hours}小时${remMins}分` : `${hours}h ${remMins}m`;
+    }
+    const days = Math.floor(hours / 24);
+    const remHours = hours % 24;
+    if (remHours === 0) return isZh ? `${days}天` : `${days}d`;
+    return isZh ? `${days}天${remHours}小时` : `${days}d ${remHours}h`;
+  }
+
+  /**
+   * Convert value to valid positive number timestamp, supporting string numbers
+   */
+  function toValidTimestamp(v) {
+    if (v === undefined || v === null || v === '') return null;
+    const num = Number(v);
+    return (!isNaN(num) && num > 0) ? num : null;
+  }
+
+  /**
+   * Helper to format Unix timestamp (seconds or milliseconds) to readable local time string
+   */
+  function formatTimestamp(ts) {
+    const validTs = toValidTimestamp(ts);
+    if (!validTs) return null;
+    const ms = validTs > 1e11 ? validTs : validTs * 1000;
+    try {
+      const d = new Date(ms);
+      if (isNaN(d.getTime())) return null;
+      const pad = (n) => String(n).padStart(2, '0');
+      const Y = d.getFullYear();
+      const M = pad(d.getMonth() + 1);
+      const D = pad(d.getDate());
+      const h = pad(d.getHours());
+      const m = pad(d.getMinutes());
+      const s = pad(d.getSeconds());
+      return `${Y}-${M}-${D} ${h}:${m}:${s}`;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /**
+   * Parse and calculate JWT expiration status and relative timings
+   */
+  function parseJwtStatus(payload) {
+    if (!payload || typeof payload !== 'object') {
+      return { status: 'no_exp', label: getMsg('jwtStatusNoExp', 'No Expiry'), isExpired: false, expTimeStr: null, iatTimeStr: null, relativeStr: '' };
+    }
+
+    const isZh = currentLang === 'zh_CN';
+    const exp = toValidTimestamp(payload.exp);
+    const iat = toValidTimestamp(payload.iat);
+    const expTimeStr = exp ? formatTimestamp(exp) : null;
+    const iatTimeStr = iat ? formatTimestamp(iat) : null;
+
+    if (exp === null) {
+      return {
+        status: 'no_exp',
+        label: getMsg('jwtStatusNoExp', 'No Expiry'),
+        isExpired: false,
+        expTimeStr: null,
+        iatTimeStr,
+        relativeStr: isZh ? '无过期时间' : 'No Expiry'
+      };
+    }
+
+    const nowSec = Date.now() / 1000;
+    const expSec = exp > 1e11 ? exp / 1000 : exp;
+
+    if (nowSec > expSec) {
+      const diff = nowSec - expSec;
+      const duration = formatDuration(diff);
+      return {
+        status: 'expired',
+        label: getMsg('jwtStatusExpired', 'Expired'),
+        isExpired: true,
+        expTimeStr,
+        iatTimeStr,
+        relativeStr: isZh ? `已过期 ${duration}` : `Expired ${duration} ago`
+      };
+    } else {
+      const diff = expSec - nowSec;
+      const duration = formatDuration(diff);
+      return {
+        status: 'active',
+        label: getMsg('jwtStatusActive', 'Active'),
+        isExpired: false,
+        expTimeStr,
+        iatTimeStr,
+        relativeStr: isZh ? `还剩 ${duration} 到期` : `Expires in ${duration}`
+      };
+    }
+  }
+
   function tryParseJWT(token) {
     if (!token || typeof token !== 'string') return null;
     const parts = token.trim().split('.');
@@ -367,11 +496,14 @@ document.addEventListener('DOMContentLoaded', () => {
         return null;
       }
 
+      const statusInfo = parseJwtStatus(payloadObj);
+
       return {
         header: headerObj,
         payload: payloadObj,
         headerRaw: JSON.stringify(headerObj, null, 2),
-        payloadRaw: JSON.stringify(payloadObj, null, 2)
+        payloadRaw: JSON.stringify(payloadObj, null, 2),
+        statusInfo: statusInfo
       };
     } catch (e) {
       return null;
@@ -436,10 +568,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const jwtInfo = tryParseJWT(val);
     if (jwtInfo) {
       currentDecodedText = jwtInfo.payloadRaw;
-      smartDecodeText.textContent = `[Header]\n${jwtInfo.headerRaw}\n\n[Payload]\n${jwtInfo.payloadRaw}`;
+      const statusDot = jwtInfo.statusInfo.status === 'expired' ? '🔴' : (jwtInfo.statusInfo.status === 'active' ? '🟢' : '⚪');
+      let statusLine = `[Status] ${statusDot} ${jwtInfo.statusInfo.relativeStr}`;
+      if (jwtInfo.statusInfo.expTimeStr) {
+        statusLine += `\n[${getMsg('jwtLabelExp', '到期')}] ${jwtInfo.statusInfo.expTimeStr}`;
+      }
+      if (jwtInfo.statusInfo.iatTimeStr) {
+        statusLine += `\n[${getMsg('jwtLabelIat', '签发')}] ${jwtInfo.statusInfo.iatTimeStr}`;
+      }
+      if (jwtInfo.payload.sub) {
+        statusLine += `\n[${getMsg('jwtLabelSub', '主体')}] ${jwtInfo.payload.sub}`;
+      }
+      smartDecodeText.textContent = `${statusLine}\n\n[Header]\n${jwtInfo.headerRaw}\n\n[Payload]\n${jwtInfo.payloadRaw}`;
       smartDecodeCard.classList.remove('hidden');
       const badgeSpan = smartDecodeCard.querySelector('.smart-decode-badge span');
-      if (badgeSpan) badgeSpan.textContent = 'JWT Token';
+      if (badgeSpan) badgeSpan.textContent = `JWT Token (${statusDot} ${jwtInfo.statusInfo.label})`;
       const copySpan = btnCopyDecoded.querySelector('span');
       if (copySpan) copySpan.textContent = getMsg('btnCopyPayload', '复制 Payload');
       return;

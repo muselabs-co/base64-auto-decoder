@@ -30,10 +30,11 @@
   - 顶部控制区重构为左右对称双列设计（全局开关 + 当前网站），搭配精致的 34×18 紧凑型 iOS 开关，高度直降 45%，省出大量垂直可视空间。
 - **弹窗顶栏中英双语切换器 (v1.2.0 新增)**：
   - 弹窗顶栏内嵌极简 `[ EN / 中 ]` 切换器，默认首选语言为英文（`en`），点击即秒级无刷新全量切换。
-- **JWT (JSON Web Token) 智能解析 (v1.2.0 新增)**：
-  - 自动识别网页中的三段式 JWT Token，原地显示专属紫色 `[JWT]` 徽章。
-  - 鼠标悬停弹出卡片，结构化展示格式化后的 Header 与 Payload JSON，并提供一键复制 Payload。
-  - 弹窗 Smart Decoder 输入框中粘贴 JWT 时亦可直接格式化展示并一键复制 Payload。
+- **JWT (JSON Web Token) 智能解析与有效状态感知 (v1.2.1 升级)**：
+  - 自动识别网页中的三段式 JWT Token，原地显示专属状态徽章（`[JWT 🟢]` 有效中 / `[JWT 🔴]` 已过期 / `[JWT ⚪]` 无过期）。
+  - 智能比对本地当前时间与 `exp` / `iat` 时间戳，自动计算剩余有效时长或已过期时长（如 `还剩 25分钟到期` / `已过期 2小时`）。
+  - 鼠标悬停弹出卡片，结构化展示算法 (alg)、主体 (sub)、本地可读的过期与签发时间、Payload JSON，并提供一键复制 Payload。
+  - 弹窗 Smart Decoder 输入框中粘贴 JWT 时亦同步展示有效状态、过期倒计时与格式化 Payload。
 - **Base64 图片识别与悬停预览 (v1.2.0 新增)**：
   - 自动识别 `data:image/...` 及常见图片魔数（PNG、JPEG、GIF、WEBP），原地显示绿色 `[IMG]` 徽章。
   - 鼠标悬停弹出交互浮窗，展示缩略图、尺寸及一键「下载图片」与「复制图片链接」。
@@ -73,7 +74,7 @@ base64-decoder/
 ## 🚀 安装与使用指南
 
 ### 方式 1：从 GitHub Release 下载安装（推荐）
-1. 在本仓库的 [Releases](https://github.com/muselabs-co/base64-auto-decoder/releases) 页面下载最新的 `base64-decoder-v1.2.0.zip`。
+1. 在本仓库的 [Releases](https://github.com/muselabs-co/base64-auto-decoder/releases) 页面下载最新的 `base64-decoder-v1.2.1.zip`。
 2. 解压下载的 zip 文件到一个固定目录。
 3. 打开 Chrome 浏览器，在地址栏输入 `chrome://extensions/` 回车。
 4. 打开右上角的 **“开发者模式” (Developer mode)** 开关。
@@ -91,7 +92,7 @@ base64-decoder/
 ## 🧪 测试验证
 
 - **方式 1（浏览器真实测试）**：
-  安装插件后，在 Chrome 中直接打开 `test/test_page.html`，即可看到各类 Base64 文本、JWT 令牌、图片被原地解码，并支持右键菜单测试。页面右上角支持 `[ 🇨🇳 中文 | 🇬🇧 English ]` 自由切换语言。
+  安装插件后，在 Chrome 中直接打开 `test/test_page.html`，即可看到各类 Base64 文本、JWT 令牌、图片被原地解码，并支持右键菜单测试。页面右上角支持 `[ 中文 | English ]` 自由切换语言。
 - **方式 2（命令行单元测试）**：
   在项目根目录下运行：
   ```bash

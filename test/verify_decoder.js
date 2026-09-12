@@ -125,5 +125,91 @@ for (const tc of testCases) {
   }
 }
 
-console.log(`\nResults: ${passed} passed, ${failed} failed.`);
-if (failed > 0) process.exit(1);
+console.log(`\nBase64 Results: ${passed} passed, ${failed} failed.`);
+
+// -------------------------------------------------------------
+// JWT Status & Expiration Tests (v1.2.1)
+// -------------------------------------------------------------
+console.log("\nRunning JWT Status Tests (v1.2.1)...");
+
+function toValidTimestamp(v) {
+  if (v === undefined || v === null || v === '') return null;
+  const num = Number(v);
+  return (!isNaN(num) && num > 0) ? num : null;
+}
+
+function parseJwtStatusTest(payload, nowSec = 1700000000) {
+  if (!payload || typeof payload !== 'object') {
+    return { status: 'no_exp', isExpired: false };
+  }
+  const exp = toValidTimestamp(payload.exp);
+  if (exp === null) {
+    return { status: 'no_exp', isExpired: false };
+  }
+  const expSec = exp > 1e11 ? exp / 1000 : exp;
+  if (nowSec > expSec) {
+    return { status: 'expired', isExpired: true };
+  } else {
+    return { status: 'active', isExpired: false };
+  }
+}
+
+const jwtTestCases = [
+  {
+    name: "Active JWT with future expiration",
+    payload: { sub: "admin", exp: 1700003600 }, // +1 hour
+    nowSec: 1700000000,
+    expectedStatus: "active",
+    expectedExpired: false
+  },
+  {
+    name: "Active JWT with string numeric expiration (tolerance)",
+    payload: { sub: "admin_str", exp: "1700003600" }, // +1 hour as string
+    nowSec: 1700000000,
+    expectedStatus: "active",
+    expectedExpired: false
+  },
+  {
+    name: "Expired JWT with past expiration",
+    payload: { sub: "user1", exp: 1699990000 }, // past
+    nowSec: 1700000000,
+    expectedStatus: "expired",
+    expectedExpired: true
+  },
+  {
+    name: "Active JWT with millisecond timestamp (13 digits)",
+    payload: { sub: "admin_ms", exp: 1700003600000 }, // +1 hour in ms
+    nowSec: 1700000000,
+    expectedStatus: "active",
+    expectedExpired: false
+  },
+  {
+    name: "JWT without exp field",
+    payload: { sub: "perpetual_token", iat: 1700000000 },
+    nowSec: 1700000000,
+    expectedStatus: "no_exp",
+    expectedExpired: false
+  }
+];
+
+let jwtPassed = 0;
+let jwtFailed = 0;
+
+for (const tc of jwtTestCases) {
+  const res = parseJwtStatusTest(tc.payload, tc.nowSec);
+  const ok = res.status === tc.expectedStatus && res.isExpired === tc.expectedExpired;
+  if (ok) {
+    jwtPassed++;
+    console.log(`✅ PASS: [${tc.name}] => status: ${res.status}, isExpired: ${res.isExpired}`);
+  } else {
+    jwtFailed++;
+    console.error(`❌ FAIL: [${tc.name}]`);
+    console.error(`   Expected: status: ${tc.expectedStatus}, isExpired: ${tc.expectedExpired}`);
+    console.error(`   Got:      status: ${res.status}, isExpired: ${res.isExpired}`);
+  }
+}
+
+console.log(`\nJWT Results: ${jwtPassed} passed, ${jwtFailed} failed.`);
+
+if (failed > 0 || jwtFailed > 0) process.exit(1);
+

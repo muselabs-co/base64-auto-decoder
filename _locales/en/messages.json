@@ -28,7 +28,7 @@
     "description": "Hint text at the bottom of popup."
   },
   "footerVersion": {
-    "message": "v1.2.0",
+    "message": "v1.2.1",
     "description": "Version text in popup."
   },
   "copyButtonTitle": {
@@ -126,6 +126,38 @@
   "btnCopyPayload": {
     "message": "Copy Payload",
     "description": "Button to copy JWT payload"
+  },
+  "btnCopyToken": {
+    "message": "Copy Token",
+    "description": "Button to copy raw JWT token"
+  },
+  "jwtStatusActive": {
+    "message": "Active",
+    "description": "JWT active status"
+  },
+  "jwtStatusExpired": {
+    "message": "Expired",
+    "description": "JWT expired status"
+  },
+  "jwtStatusNoExp": {
+    "message": "No Expiry",
+    "description": "JWT no expiry status"
+  },
+  "jwtLabelAlg": {
+    "message": "Algorithm",
+    "description": "JWT algorithm label"
+  },
+  "jwtLabelSub": {
+    "message": "Subject",
+    "description": "JWT subject label"
+  },
+  "jwtLabelExp": {
+    "message": "Expires",
+    "description": "JWT expires label"
+  },
+  "jwtLabelIat": {
+    "message": "Issued At",
+    "description": "JWT issued at label"
   },
   "imageBadgeTitle": {
     "message": "Base64 Image",

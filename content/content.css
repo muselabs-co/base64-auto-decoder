@@ -147,6 +147,24 @@
   color: #7e22ce;
 }
 
+.b64-jwt-tag.b64-jwt-active {
+  background-color: rgba(16, 185, 129, 0.15);
+  color: #059669;
+}
+
+.b64-jwt-tag.b64-jwt-expired {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: #dc2626;
+}
+
+.b64-jwt-wrapper.b64-jwt-active {
+  border-bottom-color: rgba(16, 185, 129, 0.5) !important;
+}
+
+.b64-jwt-wrapper.b64-jwt-expired {
+  border-bottom-color: rgba(239, 68, 68, 0.5) !important;
+}
+
 /* Image Badge */
 .b64-image-wrapper {
   background-color: rgba(16, 185, 129, 0.09) !important;
@@ -230,6 +248,14 @@
     color: #c084fc;
     background-color: rgba(147, 51, 234, 0.3);
   }
+  .b64-jwt-tag.b64-jwt-active {
+    color: #34d399;
+    background-color: rgba(16, 185, 129, 0.25);
+  }
+  .b64-jwt-tag.b64-jwt-expired {
+    color: #f87171;
+    background-color: rgba(239, 68, 68, 0.25);
+  }
   .b64-image-tag {
     color: #34d399;
     background-color: rgba(16, 185, 129, 0.3);
@@ -250,9 +276,120 @@
   color: #111827;
 }
 
+/* JWT Status Pill */
+.b64-jwt-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 7px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.b64-jwt-status-pill .status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.b64-jwt-status-pill.pill-active {
+  background: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+.b64-jwt-status-pill.pill-active .status-dot {
+  background: #10b981;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+}
+
+.b64-jwt-status-pill.pill-expired {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+.b64-jwt-status-pill.pill-expired .status-dot {
+  background: #ef4444;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+}
+
+.b64-jwt-status-pill.pill-neutral {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+}
+.b64-jwt-status-pill.pill-neutral .status-dot {
+  background: #9ca3af;
+}
+
+/* JWT Meta Box */
+.b64-jwt-meta-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 6px 8px;
+  margin-bottom: 8px;
+  font-size: 11px;
+}
+
+.b64-jwt-meta-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.b64-jwt-meta-grid .meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.b64-jwt-meta-grid .meta-label {
+  color: #64748b;
+  font-weight: 500;
+}
+
+.b64-jwt-meta-grid .meta-val {
+  color: #0f172a;
+  font-weight: 600;
+  text-align: right;
+}
+
+.b64-jwt-meta-grid .font-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
 @media (prefers-color-scheme: dark) {
   .b64-popover-title {
     color: #f9fafb;
+  }
+  .b64-jwt-status-pill.pill-active {
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+    border-color: rgba(16, 185, 129, 0.3);
+  }
+  .b64-jwt-status-pill.pill-expired {
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+    border-color: rgba(239, 68, 68, 0.3);
+  }
+  .b64-jwt-status-pill.pill-neutral {
+    background: rgba(156, 163, 175, 0.15);
+    color: #d1d5db;
+    border-color: rgba(156, 163, 175, 0.3);
+  }
+  .b64-jwt-meta-box {
+    background: #111827;
+    border-color: #374151;
+  }
+  .b64-jwt-meta-grid .meta-label {
+    color: #9ca3af;
+  }
+  .b64-jwt-meta-grid .meta-val {
+    color: #f3f4f6;
   }
 }
 
