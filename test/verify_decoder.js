@@ -108,6 +108,7 @@ const testCases = [
   { input: "administrator", expected: null, desc: "Pure lowercase English word" },
   { input: "INTERNATIONALIZATION", expected: null, desc: "Pure uppercase English word" },
   { input: "Scarcity", expected: null, desc: "Capitalized English word (must NOT decode to Iƫr+r)" },
+  { input: "Remotion", expected: null, desc: "Capitalized English word (must NOT decode to E騶*')" },
   { input: "Democratization", expected: null, desc: "Capitalized English word" },
   { input: "Platform", expected: null, desc: "Capitalized English word" },
   { input: "Software", expected: null, desc: "Capitalized English word" },
