@@ -10,6 +10,7 @@ A lightweight, zero-dependency, pure vanilla, and high-precision Chrome Extensio
 - **High-Precision Filtering (Anti-False-Positive)**:
   - Supports UTF-8 multi-byte decoding with strict `TextDecoder` validation.
   - Intelligently filters out standard English words, UUIDs, Git Commit hashes (SHA-1/256), preventing page layout corruption or accidental replacements.
+  - **Enhanced in v1.2.2**: Comprehensive filtering for capitalized/TitleCase words (e.g. `Scarcity`, `Democratization`) and tightened readable text validation excluding non-standard phonetic Latin Extended-B characters.
 - **One-Click Copy**: Decoded text includes a lightweight copy icon 📋 with immediate visual feedback.
 - **Original Source Tracing**: Hover over any decoded text to preview the original raw Base64 string in a tooltip, with one-click copy.
 - **Anti-Flicker Hover Bridge & Viewport Auto-Alignment (New in v1.2.0)**:
@@ -74,7 +75,7 @@ base64-decoder/
 ## 🚀 Installation & Usage
 
 ### Method 1: Download from GitHub Releases (Recommended)
-1. Download `base64-decoder-v1.2.1.zip` from the [Releases](https://github.com/muselabs-co/base64-auto-decoder/releases) page.
+1. Download `base64-decoder-v1.2.2.zip` from the [Releases](https://github.com/muselabs-co/base64-auto-decoder/releases) page.
 2. Extract the zip archive to a local folder.
 3. Open Google Chrome and navigate to `chrome://extensions/`.
 4. Enable **Developer mode** in the top-right corner.

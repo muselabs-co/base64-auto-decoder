@@ -81,6 +81,7 @@
 
       if (/^[a-z]+$/.test(token)) return false;
       if (/^[A-Z]+$/.test(token)) return false;
+      if (/^[A-Z][a-z]+$/.test(token)) return false;
       if (/^[0-9]+$/.test(token)) return false;
       if (/^[0-9a-f]{16,}$/i.test(token)) return false;
     }
@@ -136,8 +137,11 @@
     if (/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/.test(text)) {
       return false;
     }
+    if (/\r(?!\n)/.test(text)) {
+      return false;
+    }
 
-    const allowedRegex = /^[\s\x20-\x7E\u00A0-\u024F\u0400-\u04FF\u2000-\u206F\u20A0-\u20CF\u3000-\u303F\u3040-\u30FF\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\uFF00-\uFFEF\u{1F300}-\u{1FAFF}]+$/u;
+    const allowedRegex = /^[\s\x20-\x7E\u00A0-\u017F\u0400-\u04FF\u2000-\u206F\u20A0-\u20CF\u3000-\u303F\u3040-\u30FF\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\uFF00-\uFFEF\u{1F300}-\u{1FAFF}]+$/u;
     return allowedRegex.test(text);
   }
 

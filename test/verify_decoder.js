@@ -20,6 +20,8 @@ function isValidBase64Candidate(token) {
     if (/^[a-z]+$/.test(token)) return false;
     // Discard pure uppercase
     if (/^[A-Z]+$/.test(token)) return false;
+    // Discard TitleCase / capitalized words (ordinary words like 'Scarcity', 'Democratization')
+    if (/^[A-Z][a-z]+$/.test(token)) return false;
     // Discard pure numbers
     if (/^[0-9]+$/.test(token)) return false;
     // Discard pure hex hashes (like git sha1 40 chars, sha256 64 chars, md5 32 chars)
@@ -73,10 +75,14 @@ function isReadableText(text, original) {
   if (/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/.test(text)) {
     return false;
   }
+  // Reject isolated carriage return (\r not followed by \n)
+  if (/\r(?!\n)/.test(text)) {
+    return false;
+  }
 
   // Check character validity
-  // Allow ASCII printable, common punctuation, Chinese/Japanese/Korean, Cyrillic, Emojis
-  const allowedRegex = /^[\s\x20-\x7E\u00A0-\u024F\u0400-\u04FF\u2000-\u206F\u20A0-\u20CF\u3000-\u303F\u3040-\u30FF\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\uFF00-\uFFEF\u{1F300}-\u{1FAFF}]+$/u;
+  // Allow ASCII printable, common punctuation, Latin-1 & Latin Extended-A European characters, Chinese/Japanese/Korean, Cyrillic, Emojis
+  const allowedRegex = /^[\s\x20-\x7E\u00A0-\u017F\u0400-\u04FF\u2000-\u206F\u20A0-\u20CF\u3000-\u303F\u3040-\u30FF\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\uFF00-\uFFEF\u{1F300}-\u{1FAFF}]+$/u;
   if (!allowedRegex.test(text)) {
     return false;
   }
@@ -101,6 +107,11 @@ const testCases = [
   { input: "hello", expected: null, desc: "Common English word (length 5)" },
   { input: "administrator", expected: null, desc: "Pure lowercase English word" },
   { input: "INTERNATIONALIZATION", expected: null, desc: "Pure uppercase English word" },
+  { input: "Scarcity", expected: null, desc: "Capitalized English word (must NOT decode to Iƫr+r)" },
+  { input: "Democratization", expected: null, desc: "Capitalized English word" },
+  { input: "Platform", expected: null, desc: "Capitalized English word" },
+  { input: "Software", expected: null, desc: "Capitalized English word" },
+  { input: "Security", expected: null, desc: "Capitalized English word" },
   { input: "1234567890", expected: null, desc: "Pure numbers" },
   { input: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", expected: null, desc: "SHA-256 hex hash" },
   { input: "7b502c3a1f489b0d23e6", expected: null, desc: "Hex commit ID / token" },

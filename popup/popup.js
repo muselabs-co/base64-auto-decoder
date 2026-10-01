@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const MESSAGES = {
     en: {
       popupTitle: 'Base64 Decoder',
-      footerVersion: 'v1.2.1',
+      footerVersion: 'v1.2.2',
       statusLabel: 'Auto Decode',
       statusEnabled: 'Enabled',
       statusDisabled: 'Disabled',
@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
     },
     zh_CN: {
       popupTitle: 'Base64 自动解码',
-      footerVersion: 'v1.2.1',
+      footerVersion: 'v1.2.2',
       statusLabel: '自动解码',
       statusEnabled: '已开启',
       statusDisabled: '已关闭',
@@ -510,10 +510,31 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  function isValidBase64Candidate(token) {
+    if (!token) return false;
+    if (!/^[A-Za-z0-9+/_-]+={0,2}$/.test(token)) return false;
+
+    const hasPadding = token.endsWith('=');
+    if (hasPadding) {
+      if (token.length < 4 || token.length % 4 !== 0) return false;
+    } else {
+      if (token.length < 8) return false;
+      if (token.length % 4 === 1) return false;
+
+      if (/^[a-z]+$/.test(token)) return false;
+      if (/^[A-Z]+$/.test(token)) return false;
+      if (/^[A-Z][a-z]+$/.test(token)) return false;
+      if (/^[0-9]+$/.test(token)) return false;
+      if (/^[0-9a-f]{16,}$/i.test(token)) return false;
+    }
+
+    return true;
+  }
+
   function decodeBase64Text(candidate) {
-    if (!candidate || candidate.length < 4) return null;
+    if (!candidate) return null;
     const cleaned = candidate.trim();
-    if (!/^[A-Za-z0-9+/_-]+={0,2}$/.test(cleaned)) return null;
+    if (!isValidBase64Candidate(cleaned)) return null;
 
     let normalized = cleaned.replace(/-/g, '+').replace(/_/g, '/');
     while (normalized.length % 4 !== 0) {
@@ -533,8 +554,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!text || text.trim().length === 0) return null;
       if (text.trim() === cleaned) return null;
       if (/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/.test(text)) return null;
+      if (/\r(?!\n)/.test(text)) return null;
 
-      const allowedRegex = /^[\s\x20-\x7E\u00A0-\u024F\u0400-\u04FF\u2000-\u206F\u20A0-\u20CF\u3000-\u303F\u3040-\u30FF\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\uFF00-\uFFEF\u{1F300}-\u{1FAFF}]+$/u;
+      const allowedRegex = /^[\s\x20-\x7E\u00A0-\u017F\u0400-\u04FF\u2000-\u206F\u20A0-\u20CF\u3000-\u303F\u3040-\u30FF\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\uFF00-\uFFEF\u{1F300}-\u{1FAFF}]+$/u;
       if (!allowedRegex.test(text)) return null;
 
       return text;
