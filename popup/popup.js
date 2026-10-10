@@ -24,11 +24,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const MESSAGES = {
     en: {
       popupTitle: 'Base64 Decoder',
-      footerVersion: 'v1.2.2',
+      footerVersion: 'v1.2.3',
       statusLabel: 'Auto Decode',
       statusEnabled: 'Enabled',
       statusDisabled: 'Disabled',
       siteSettingLabel: 'Current Site',
+      identifierLabel: 'Decode Usernames',
+      identifierDesc: 'Links & @mentions',
       blacklistTitle: 'Blacklist Management',
       domainPlaceholder: 'Enter domain (e.g. v2ex.com)...',
       btnAddDomain: 'Add',
@@ -57,11 +59,13 @@ document.addEventListener('DOMContentLoaded', () => {
     },
     zh_CN: {
       popupTitle: 'Base64 自动解码',
-      footerVersion: 'v1.2.2',
+      footerVersion: 'v1.2.3',
       statusLabel: '自动解码',
       statusEnabled: '已开启',
       statusDisabled: '已关闭',
       siteSettingLabel: '当前网站',
+      identifierLabel: '解码用户名',
+      identifierDesc: '用户名链接及 @ 提及',
       blacklistTitle: '网站黑名单管理',
       domainPlaceholder: '输入域名 (如 v2ex.com)...',
       btnAddDomain: '添加',
@@ -195,6 +199,17 @@ document.addEventListener('DOMContentLoaded', () => {
     storage.set({ enabled }, () => {
       updateStatusUI(enabled);
     });
+  });
+
+  // Identifier Decode Switch (link text & @mentions, off by default)
+  const identifierToggle = document.getElementById('identifier-toggle-switch');
+
+  storage.get({ decodeIdentifiers: false }, (res) => {
+    identifierToggle.checked = res.decodeIdentifiers === true;
+  });
+
+  identifierToggle.addEventListener('change', () => {
+    storage.set({ decodeIdentifiers: identifierToggle.checked });
   });
 
   // Current Site Logic

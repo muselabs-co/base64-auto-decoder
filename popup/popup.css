@@ -231,6 +231,38 @@ body::-webkit-scrollbar-thumb {
   }
 }
 
+/* Full-width Option Card */
+.option-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 7px 10px;
+  border-radius: 10px;
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+}
+
+.option-text {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+}
+
+.option-card .setting-label {
+  flex-shrink: 0;
+}
+
+.option-desc {
+  font-size: 10.5px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* Compact iOS Style Switch */
 .switch {
   position: relative;

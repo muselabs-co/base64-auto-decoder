@@ -11,6 +11,7 @@
   - 支持中文 UTF-8 解码（`TextDecoder` 严格校验）。
   - 智能过滤纯英文单词、UUID、Git Commit SHA1/256 哈希值等，杜绝页面乱码与误伤。
   - **v1.2.2 强化**：全面过滤句首/标题中的首字母大写词（如 `Scarcity`、`Democratization`），收紧可读文本字符集并剔除非标准音标字符碰撞，彻底杜绝普通英文被误解码。
+  - **v1.2.3 新增**：恰好是合法 Base64 的用户名（如 V2EX 上的 `Y25tIGxpdmlk`），在用户名链接和 `@` 提及中默认不再解码；想发现这类彩蛋，可在弹窗中开启「解码用户名」。
 - **一键复制小图标**：解码明文旁边附带轻巧的复制图标 📋，点击后一秒复制并弹出成功反馈。
 - **原始 Base64 溯源与复制**：鼠标悬停在解码文本上即可查看原串内容，并支持一键复制原始 Base64。
 - **无感悬停桥梁与视口自适应 (v1.2.0 新增)**：
@@ -56,8 +57,8 @@ base64-decoder/
 ├── background/              # 后台 Service Worker 脚本 (Manifest V3)
 │   └── background.js        # 右键上下文菜单与标签页消息分发
 ├── _locales/                # 原生国际化多语言包
-│   ├── en/messages.json     # 英文文案 (42 keys)
-│   └── zh_CN/messages.json  # 中文文案 (42 keys)
+│   ├── en/messages.json     # 英文文案 (52 keys)
+│   └── zh_CN/messages.json  # 中文文案 (52 keys)
 ├── popup/                   # 插件弹窗控制面板 (原生 HTML/CSS/JS)
 │   ├── popup.html           # 弹窗结构 (双列紧凑开关 + 黑名单 + 常用管理)
 │   ├── popup.css            # 弹窗精致样式、双列布局与深色模式适配
@@ -75,7 +76,7 @@ base64-decoder/
 ## 🚀 安装与使用指南
 
 ### 方式 1：从 GitHub Release 下载安装（推荐）
-1. 在本仓库的 [Releases](https://github.com/muselabs-co/base64-auto-decoder/releases) 页面下载最新的 `base64-decoder-v1.2.2.zip`。
+1. 在本仓库的 [Releases](https://github.com/muselabs-co/base64-auto-decoder/releases) 页面下载最新的 `base64-decoder-v1.2.3.zip`。
 2. 解压下载的 zip 文件到一个固定目录。
 3. 打开 Chrome 浏览器，在地址栏输入 `chrome://extensions/` 回车。
 4. 打开右上角的 **“开发者模式” (Developer mode)** 开关。

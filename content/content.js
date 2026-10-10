@@ -7,6 +7,7 @@
 
   let isGlobalEnabled = true;
   let disabledDomains = [];
+  let decodeIdentifiers = false;
   let observer = null;
   let debounceTimer = null;
 
@@ -534,6 +535,34 @@
   }
 
   /**
+   * Character immediately before text[index], looking into the previous text sibling if needed
+   */
+  function charBefore(node, text, index) {
+    if (index > 0) return text[index - 1];
+    const prev = node.previousSibling;
+    if (prev && prev.nodeType === Node.TEXT_NODE && prev.textContent) {
+      return prev.textContent[prev.textContent.length - 1];
+    }
+    return '';
+  }
+
+  /**
+   * Whether candidate is the whole text of a link that also carries it in href,
+   * e.g. a username link <a href="/member/Y25tIGxpdmlk">Y25tIGxpdmlk</a>
+   */
+  function isLinkIdentifier(node, candidate) {
+    if (node.textContent.trim().replace(/^@/, '') !== candidate) return false;
+    const link = node.parentElement && node.parentElement.closest('a[href]');
+    if (!link || link.textContent.trim().replace(/^@/, '') !== candidate) return false;
+    const href = link.getAttribute('href');
+    let decodedHref = href;
+    try {
+      decodedHref = decodeURIComponent(href);
+    } catch (e) {}
+    return href.includes(candidate) || decodedHref.includes(candidate);
+  }
+
+  /**
    * Scan and process a single TextNode
    */
   function processTextNode(node) {
@@ -574,6 +603,9 @@
         });
         continue;
       }
+
+      // Skip identifiers: @mentions like "@Y25tIGxpdmlk" and username links
+      if (!decodeIdentifiers && (charBefore(node, text, match.index) === '@' || isLinkIdentifier(node, candidate))) continue;
 
       // 3. Check if standard Base64 text
       const decoded = tryDecodeBase64(candidate);
@@ -906,6 +938,18 @@
   }
 
   /**
+   * Revert and rescan the whole page with the observer paused, so it doesn't reprocess our own mutations
+   */
+  function rescanAll() {
+    stopObserver();
+    clearTimeout(debounceTimer);
+    pendingNodes = [];
+    revertAll();
+    scanNode(document.body);
+    startObserver();
+  }
+
+  /**
    * Context Menu Action Handlers
    */
   function handleEncodeSelection(selectedText) {
@@ -990,16 +1034,27 @@
         disabledDomains = changes.disabledDomains.newValue || [];
         changed = true;
       }
+      const identifiersChanged = changes.decodeIdentifiers !== undefined;
+      if (identifiersChanged) {
+        decodeIdentifiers = changes.decodeIdentifiers.newValue === true;
+      }
+      const wasEnabled = lastEffectiveEnabled;
       if (changed) {
         setStatus(isEffectiveEnabled());
+      }
+      // Apply the new rule to already-processed text (if the page was just enabled, setStatus already scanned with it)
+      if (identifiersChanged && wasEnabled && isEffectiveEnabled()) {
+        rescanAll();
       }
     }
   });
 
   // Initial load
-  chrome.storage.sync.get({ enabled: true, disabledDomains: [] }, (res) => {
+  chrome.storage.sync.get({ enabled: true, disabledDomains: [], decodeIdentifiers: false }, (res) => {
     isGlobalEnabled = res.enabled !== false;
     disabledDomains = res.disabledDomains || [];
+    decodeIdentifiers = res.decodeIdentifiers === true;
+    lastEffectiveEnabled = isEffectiveEnabled();
 
     if (isEffectiveEnabled()) {
       if (document.readyState === 'loading') {

@@ -28,7 +28,7 @@
     "description": "弹窗底部提示"
   },
   "footerVersion": {
-    "message": "v1.2.2",
+    "message": "v1.2.3",
     "description": "版本号"
   },
   "copyButtonTitle": {
@@ -110,6 +110,14 @@
   "siteSettingLabel": {
     "message": "当前网站",
     "description": "当前网站控制卡片标签"
+  },
+  "identifierLabel": {
+    "message": "解码用户名",
+    "description": "用户名/链接解码开关标签"
+  },
+  "identifierDesc": {
+    "message": "用户名链接及 @ 提及",
+    "description": "用户名/链接解码开关说明"
   },
   "jwtBadgeTitle": {
     "message": "JWT 令牌",

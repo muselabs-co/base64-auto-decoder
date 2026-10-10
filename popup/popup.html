@@ -13,7 +13,7 @@
         <img src="../icons/icon48.png" alt="Logo" class="logo">
         <div class="title-wrap">
           <h1 class="title" data-i18n="popupTitle">Base64 Decoder</h1>
-          <span class="badge-version" data-i18n="footerVersion">v1.2.2</span>
+          <span class="badge-version" data-i18n="footerVersion">v1.2.3</span>
         </div>
       </div>
       <div class="lang-switch-wrap">
@@ -56,6 +56,18 @@
             <span class="status-indicator status-enabled" id="site-status-indicator" data-i18n="statusEnabled">Enabled</span>
           </div>
         </div>
+      </div>
+
+      <!-- Identifier Decode Setting (usernames in links / @mentions) -->
+      <div class="setting-card option-card" id="identifier-card">
+        <div class="option-text">
+          <span class="setting-label" data-i18n="identifierLabel">Decode Usernames</span>
+          <span class="option-desc" data-i18n="identifierDesc">Links &amp; @mentions</span>
+        </div>
+        <label class="switch" for="identifier-toggle-switch">
+          <input type="checkbox" id="identifier-toggle-switch">
+          <span class="slider"></span>
+        </label>
       </div>
 
       <!-- Blacklist Management Section -->

@@ -161,6 +161,9 @@
         c5_p2: '2. Git SHA1 / SHA256 哈希值：commit hash: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 (保持原样)',
         c5_p3: '3. 普通纯数字：1234567890 (保持原样)',
         c5_p4: '4. 英文标题与首字母大写词（绝不误解码）：（The Democratization of Scarcity）以及 Remotion、Platform 保持原样',
+        c5_p5: '5. 用户名（弹窗「解码用户名」关闭时保持原样，开启后解码为 cnm livid）：',
+        c5_p5_reply: '回复',
+        c5_p6: '6. 文字与地址无关的链接（始终解码为 hello world）：',
 
         c6_title: '⚡ 动态内容加载测试 (MutationObserver)',
         c6_desc: '点击下方按钮，模拟 SPA 翻页或动态加载一条包含 Base64 的新评论：',
@@ -195,6 +198,9 @@
         c5_p2: '2. Git SHA1 / SHA256 hashes: commit hash: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 (remains untouched)',
         c5_p3: '3. Pure numeric digits: 1234567890 (remains untouched)',
         c5_p4: '4. Capitalized English titles & words (never falsely decoded): （The Democratization of Scarcity）, Remotion, Platform',
+        c5_p5: '5. Usernames (untouched while popup "Decode Usernames" is off; decoded to cnm livid when on):',
+        c5_p5_reply: 'reply',
+        c5_p6: '6. Links whose text is unrelated to href (always decoded to hello world):',
 
         c6_title: '⚡ Dynamic Content Loading Test (MutationObserver)',
         c6_desc: 'Click the button below to simulate SPA pagination or dynamically inserting a new Base64 comment:',
@@ -256,6 +262,8 @@
           <p>${d.c5_p2}</p>
           <p>${d.c5_p3}</p>
           <p>${d.c5_p4}</p>
+          <p>${d.c5_p5} <a href="https://www.v2ex.com/member/Y25tIGxpdmlk">Y25tIGxpdmlk</a> · ${d.c5_p5_reply} @<a href="https://www.v2ex.com/member/Y25tIGxpdmlk">Y25tIGxpdmlk</a> · @Y25tIGxpdmlk</p>
+          <p>${d.c5_p6} <a href="https://example.com/">aGVsbG8gd29ybGQ=</a></p>
         </div>
 
         <div class="card">

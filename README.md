@@ -11,6 +11,7 @@ A lightweight, zero-dependency, pure vanilla, and high-precision Chrome Extensio
   - Supports UTF-8 multi-byte decoding with strict `TextDecoder` validation.
   - Intelligently filters out standard English words, UUIDs, Git Commit hashes (SHA-1/256), preventing page layout corruption or accidental replacements.
   - **Enhanced in v1.2.2**: Comprehensive filtering for capitalized/TitleCase words (e.g. `Scarcity`, `Democratization`) and tightened readable text validation excluding non-standard phonetic Latin Extended-B characters.
+  - **New in v1.2.3**: Usernames that happen to be valid Base64 (e.g. `Y25tIGxpdmlk` on V2EX) are no longer decoded in username links or after `@` mentions. Want to find these easter eggs? Turn on **Decode Usernames** in the popup.
 - **One-Click Copy**: Decoded text includes a lightweight copy icon 📋 with immediate visual feedback.
 - **Original Source Tracing**: Hover over any decoded text to preview the original raw Base64 string in a tooltip, with one-click copy.
 - **Anti-Flicker Hover Bridge & Viewport Auto-Alignment (New in v1.2.0)**:
@@ -56,8 +57,8 @@ base64-decoder/
 ├── background/              # Background service worker (Manifest V3)
 │   └── background.js        # Context menus & tab message dispatcher
 ├── _locales/                # Native internationalization locale bundles
-│   ├── en/messages.json     # English messages (42 keys)
-│   └── zh_CN/messages.json  # Simplified Chinese messages (42 keys)
+│   ├── en/messages.json     # English messages (52 keys)
+│   └── zh_CN/messages.json  # Simplified Chinese messages (52 keys)
 ├── popup/                   # Popup control panel (Vanilla HTML/CSS/JS)
 │   ├── popup.html           # Popup DOM (Compact Switch + Blacklist + Snippet Manager)
 │   ├── popup.css            # Styles with Dark Mode & compact layout
@@ -75,7 +76,7 @@ base64-decoder/
 ## 🚀 Installation & Usage
 
 ### Method 1: Download from GitHub Releases (Recommended)
-1. Download `base64-decoder-v1.2.2.zip` from the [Releases](https://github.com/muselabs-co/base64-auto-decoder/releases) page.
+1. Download `base64-decoder-v1.2.3.zip` from the [Releases](https://github.com/muselabs-co/base64-auto-decoder/releases) page.
 2. Extract the zip archive to a local folder.
 3. Open Google Chrome and navigate to `chrome://extensions/`.
 4. Enable **Developer mode** in the top-right corner.

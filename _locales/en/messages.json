@@ -28,7 +28,7 @@
     "description": "Hint text at the bottom of popup."
   },
   "footerVersion": {
-    "message": "v1.2.2",
+    "message": "v1.2.3",
     "description": "Version text in popup."
   },
   "copyButtonTitle": {
@@ -110,6 +110,14 @@
   "siteSettingLabel": {
     "message": "Current Site",
     "description": "Label for current site setting card"
+  },
+  "identifierLabel": {
+    "message": "Decode Usernames",
+    "description": "Label for the username/link decode toggle"
+  },
+  "identifierDesc": {
+    "message": "Links & @mentions",
+    "description": "Hint under the username/link decode toggle"
   },
   "jwtBadgeTitle": {
     "message": "JWT Token",
