@@ -156,8 +156,14 @@
         c4_desc: '在下方输入框中选中任意文本，右键点击“转换为 Base64”测试原地替换：',
         c4_textarea: '选中这段话，右键一键转为 Base64！',
 
+        c7_badge: 'v1.2.4 新增：右键“Base64 解码”测试',
+        c7_desc: '选中下方文本，右键点击“Base64 解码”。结果总会复制到剪贴板；在输入框中，只有自动扫描也认可的 Base64 才会原地替换。',
+        c7_p1: '1. 自动扫描会跳过、但右键可以解码：QUJDREVG（ABCDEF）、d29ybmls（wornil）、TWFu（Man）',
+        c7_p2: '2. 普通单词右键解码应提示失败：annotate、Scarcity',
+        c7_p3: '3. 输入框中：选中第一个词会原地替换为 Hello World!；选中 QUJDREVG 或 WiFi 只复制、不替换，并弹出显示解码内容的警告提示：',
+
         c5_badge: '反向用例：普通英文与哈希，绝不能被误解码',
-        c5_p1: '1. 普通英文单词：this is a test for our internationalization platform.',
+        c5_p1: '1. 普通英文单词与小写型号名：this is a test for our internationalization platform, deepseekv4、airport1 保持原样.',
         c5_p2: '2. Git SHA1 / SHA256 哈希值：commit hash: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 (保持原样)',
         c5_p3: '3. 普通纯数字：1234567890 (保持原样)',
         c5_p4: '4. 英文标题与首字母大写词（绝不误解码）：（The Democratization of Scarcity）以及 Remotion、Platform 保持原样',
@@ -193,8 +199,14 @@
         c4_desc: 'Select any text in the input fields below, right-click and choose "Convert to Base64":',
         c4_textarea: 'Select this sentence, right-click to convert to Base64 in-place!',
 
+        c7_badge: 'New in v1.2.4: Context Menu "Decode Base64" Test',
+        c7_desc: 'Select text below, right-click and choose "Decode Base64". The result is always copied to the clipboard; inside input fields, only Base64 that auto-scan would also accept is replaced in place.',
+        c7_p1: '1. Skipped by auto-scan but decodable via right-click: QUJDREVG (ABCDEF), d29ybmls (wornil), TWFu (Man)',
+        c7_p2: '2. Ordinary words should show a decode-failed toast: annotate, Scarcity',
+        c7_p3: '3. In the input field: selecting the first word replaces it with Hello World!; selecting QUJDREVG or WiFi only copies (no replacement) and shows a warning toast with the decoded text:',
+
         c5_badge: 'Negative Cases: Plain English & Hashes (Must NOT be decoded)',
-        c5_p1: '1. Standard English words: this is a test for our internationalization platform.',
+        c5_p1: '1. Standard English words & lowercase model names: this is a test for our internationalization platform, deepseekv4, airport1 (remain untouched).',
         c5_p2: '2. Git SHA1 / SHA256 hashes: commit hash: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 (remains untouched)',
         c5_p3: '3. Pure numeric digits: 1234567890 (remains untouched)',
         c5_p4: '4. Capitalized English titles & words (never falsely decoded): （The Democratization of Scarcity）, Remotion, Platform',
@@ -257,6 +269,15 @@
         </div>
 
         <div class="card">
+          <span class="badge badge-input">${d.c7_badge}</span>
+          <p>${d.c7_desc}</p>
+          <p>${d.c7_p1}</p>
+          <p>${d.c7_p2}</p>
+          <p>${d.c7_p3}</p>
+          <textarea rows="2" style="width: 100%; box-sizing: border-box; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px;">SGVsbG8gV29ybGQh QUJDREVG WiFi</textarea>
+        </div>
+
+        <div class="card">
           <span class="badge badge-warning">${d.c5_badge}</span>
           <p>${d.c5_p1}</p>
           <p>${d.c5_p2}</p>
@@ -290,9 +311,11 @@
     // Initial render
     renderPage(currentLang);
 
-    // Mock Chrome Extension API for local testing without installation
-    if (!window.chrome || !chrome.runtime || !chrome.runtime.id) {
-      console.log('Detected local standalone preview; injecting mock environment for content.js...');
+    // Mock Chrome Extension API for local testing without installation. Only on explicit request
+    // (test_page.html?standalone): a page can't detect the installed extension, and a mock copy
+    // decoding the page would hide a broken extension during manual testing.
+    if (new URLSearchParams(location.search).has('standalone')) {
+      console.log('Standalone preview (?standalone); injecting mock environment for content.js...');
 
       const mockZh = {
         copyButtonTitle: '复制解码内容',
@@ -359,9 +382,13 @@
         }
       };
 
-      const script = document.createElement('script');
-      script.src = '../content/content.js';
-      document.body.appendChild(script);
+      // Same scripts and order as manifest.json content_scripts; async = false keeps them in order
+      for (const src of ['../shared/decoder.js', '../content/content.js']) {
+        const script = document.createElement('script');
+        script.src = src;
+        script.async = false;
+        document.body.appendChild(script);
+      }
     }
   </script>
 </body>

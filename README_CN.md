@@ -12,6 +12,7 @@
   - 智能过滤纯英文单词、UUID、Git Commit SHA1/256 哈希值等，杜绝页面乱码与误伤。
   - **v1.2.2 强化**：全面过滤句首/标题中的首字母大写词（如 `Scarcity`、`Democratization`），收紧可读文本字符集并剔除非标准音标字符碰撞，彻底杜绝普通英文被误解码。
   - **v1.2.3 新增**：恰好是合法 Base64 的用户名（如 V2EX 上的 `Y25tIGxpdmlk`），在用户名链接和 `@` 提及中默认不再解码；想发现这类彩蛋，可在弹窗中开启「解码用户名」。
+  - **v1.2.4 新增**：不含任何大写字母的无填充词（如 `deepseekv4`、`airport1` 等型号名）不再被自动解码成 `u穱礿` 之类的乱码。右键 **“Base64 解码”** 仍可解码自动扫描跳过的 Base64（如 `QUJDREVG`、`d29ybmls`、较短的 `TWFu`），但不会解码 `annotate` 这样的普通单词。
 - **一键复制小图标**：解码明文旁边附带轻巧的复制图标 📋，点击后一秒复制并弹出成功反馈。
 - **原始 Base64 溯源与复制**：鼠标悬停在解码文本上即可查看原串内容，并支持一键复制原始 Base64。
 - **无感悬停桥梁与视口自适应 (v1.2.0 新增)**：
@@ -19,7 +20,7 @@
   - 智能视口边界检测，贴近屏幕底部或右侧时自动朝上/朝左对齐弹出，确保操作按钮始终完全可见。
 - **选中文本右键菜单 (v1.2.0 新增)**：
   - 选中文本右键点击 **“转换为 Base64”** 或 **“Base64 解码”**。
-  - 在网页输入框（`input`、`textarea`、`contenteditable`）中支持**原地直接替换**，发帖免去任何切换！
+  - 在网页输入框（`input`、`textarea`、`contenteditable`）中支持**原地直接替换**，发帖免去任何切换！自动扫描会跳过的解码结果（如 `QUJDREVG`）只复制、不原地替换，并以警告提示显示解码内容供你判断 (v1.2.4)。
   - 在普通网页文本中支持**自动复制并弹出轻量 Toast 提示框**。
 - **当前网站独立开关 & 域名归一化 (v1.2.0 新增)**：
   - 弹窗自动感知当前网站域名（如 `v2ex.com`），支持单独为该站点开启或关闭自动解码。
@@ -57,26 +58,30 @@ base64-decoder/
 ├── background/              # 后台 Service Worker 脚本 (Manifest V3)
 │   └── background.js        # 右键上下文菜单与标签页消息分发
 ├── _locales/                # 原生国际化多语言包
-│   ├── en/messages.json     # 英文文案 (52 keys)
-│   └── zh_CN/messages.json  # 中文文案 (52 keys)
+│   ├── en/messages.json     # 英文文案 (53 keys)
+│   └── zh_CN/messages.json  # 中文文案 (53 keys)
 ├── popup/                   # 插件弹窗控制面板 (原生 HTML/CSS/JS)
 │   ├── popup.html           # 弹窗结构 (双列紧凑开关 + 黑名单 + 常用管理)
 │   ├── popup.css            # 弹窗精致样式、双列布局与深色模式适配
 │   └── popup.js             # 双语即时切换、黑名单 CRUD、存储与域名逻辑
+├── shared/                  # 内容脚本、弹窗与测试共用的代码
+│   └── decoder.js           # Base64 判定规则、可读文本校验、JWT 解析与状态格式化
 ├── content/                 # 页面内容注入脚本与样式
 │   ├── content.js           # 核心扫描、JWT/图片解析、悬停桥梁、DOM 替换与复制
 │   └── content.css          # 原地替换、悬停卡片与 Toast 样式
 ├── icons/                   # 插件高品质图标 (16x16, 48x48, 128x128)
 │   └── generate_icons.py
+├── scripts/
+│   └── package.js           # 打包发布 zip，并校验所有被加载的文件都已包含
 └── test/                    # 测试用例与独立验证
     ├── test_page.html       # 中英双语测试网页 (标准文本/JWT/图片/输入框原地替换/SPA动态)
-    └── verify_decoder.js    # Node.js 解码准确度与防误判单元测试
+    └── verify_decoder.js    # 针对 shared/decoder.js 的 Node.js 单元测试 (解码准确度、防误判、JWT 解析与状态)
 ```
 
 ## 🚀 安装与使用指南
 
 ### 方式 1：从 GitHub Release 下载安装（推荐）
-1. 在本仓库的 [Releases](https://github.com/muselabs-co/base64-auto-decoder/releases) 页面下载最新的 `base64-decoder-v1.2.3.zip`。
+1. 在本仓库的 [Releases](https://github.com/muselabs-co/base64-auto-decoder/releases) 页面下载最新的 `base64-decoder-v1.2.4.zip`。
 2. 解压下载的 zip 文件到一个固定目录。
 3. 打开 Chrome 浏览器，在地址栏输入 `chrome://extensions/` 回车。
 4. 打开右上角的 **“开发者模式” (Developer mode)** 开关。
@@ -94,10 +99,17 @@ base64-decoder/
 ## 🧪 测试验证
 
 - **方式 1（浏览器真实测试）**：
-  安装插件后，在 Chrome 中直接打开 `test/test_page.html`，即可看到各类 Base64 文本、JWT 令牌、图片被原地解码，并支持右键菜单测试。页面右上角支持 `[ 中文 | English ]` 自由切换语言。
+  安装插件后，在 Chrome 中直接打开 `test/test_page.html`，即可看到各类 Base64 文本、JWT 令牌、图片被原地解码，并支持右键菜单测试。页面右上角支持 `[ 中文 | English ]` 自由切换语言。如果不安装插件只想预览效果，可打开 `test/test_page.html?standalone`，页面会用模拟的 `chrome` 接口自行加载内容脚本（此模式下没有右键菜单）。
 - **方式 2（命令行单元测试）**：
   在项目根目录下运行：
   ```bash
   node test/verify_decoder.js
   ```
+
+## 📦 打包发布
+
+在项目根目录生成 `base64-decoder-v<版本号>.zip`（版本号取自 `manifest.json`）。若 `manifest.json` 或 `popup.html` 引用的任何文件（如 `shared/decoder.js`）未被打进 zip，脚本会直接报错：
+```bash
+node scripts/package.js
+```
 

@@ -28,7 +28,7 @@
     "description": "弹窗底部提示"
   },
   "footerVersion": {
-    "message": "v1.2.3",
+    "message": "v1.2.4",
     "description": "版本号"
   },
   "copyButtonTitle": {
@@ -102,6 +102,13 @@
   "toastDecoded": {
     "message": "解码成功，已复制到剪贴板！",
     "description": "右键解码成功提示"
+  },
+  "toastDecodedUnsure": {
+    "message": "已复制解码结果（可能不是真正的 Base64，未原地替换）：$TEXT$",
+    "description": "右键解码结果可信度较低时的提示，附带解码内容",
+    "placeholders": {
+      "text": { "content": "$1", "example": "Z!b" }
+    }
   },
   "toastDecodeFailed": {
     "message": "所选内容非有效 Base64 文本",

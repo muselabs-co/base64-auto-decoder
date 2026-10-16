@@ -12,6 +12,7 @@ A lightweight, zero-dependency, pure vanilla, and high-precision Chrome Extensio
   - Intelligently filters out standard English words, UUIDs, Git Commit hashes (SHA-1/256), preventing page layout corruption or accidental replacements.
   - **Enhanced in v1.2.2**: Comprehensive filtering for capitalized/TitleCase words (e.g. `Scarcity`, `Democratization`) and tightened readable text validation excluding non-standard phonetic Latin Extended-B characters.
   - **New in v1.2.3**: Usernames that happen to be valid Base64 (e.g. `Y25tIGxpdmlk` on V2EX) are no longer decoded in username links or after `@` mentions. Want to find these easter eggs? Turn on **Decode Usernames** in the popup.
+  - **New in v1.2.4**: Unpadded tokens without any uppercase letter (e.g. model names like `deepseekv4`, `airport1`) are no longer auto-decoded into garbage such as `u穱礿`. Right-click **"Decode Base64"** still decodes Base64 that auto-scan skips (e.g. `QUJDREVG`, `d29ybmls`, short `TWFu`), but never ordinary words like `annotate`.
 - **One-Click Copy**: Decoded text includes a lightweight copy icon 📋 with immediate visual feedback.
 - **Original Source Tracing**: Hover over any decoded text to preview the original raw Base64 string in a tooltip, with one-click copy.
 - **Anti-Flicker Hover Bridge & Viewport Auto-Alignment (New in v1.2.0)**:
@@ -19,7 +20,7 @@ A lightweight, zero-dependency, pure vanilla, and high-precision Chrome Extensio
   - Smart viewport boundary collision detection automatically repositions tooltips (top/bottom/left/right) to keep buttons always accessible.
 - **Right-Click Context Menu (New in v1.2.0)**:
   - Select any text and right-click -> **"Encode to Base64"** or **"Decode Base64"**.
-  - In editable fields (`input`, `textarea`, `contenteditable`), replaces selection **in-place** instantly—perfect for forum posting!
+  - In editable fields (`input`, `textarea`, `contenteditable`), replaces selection **in-place** instantly—perfect for forum posting! Decoded results that auto-scan would skip (e.g. `QUJDREVG`) are only copied, never replaced in place, and a warning toast shows the decoded text so you can judge it (v1.2.4).
   - In regular page text, copies result to clipboard with a clean floating Toast notification.
 - **Current Site Toggle & Domain Normalization (New in v1.2.0)**:
   - Dedicated site toggle in popup automatically detects the active website (e.g. `v2ex.com`) and allows enabling/disabling auto-decoding per site with a single click.
@@ -57,26 +58,30 @@ base64-decoder/
 ├── background/              # Background service worker (Manifest V3)
 │   └── background.js        # Context menus & tab message dispatcher
 ├── _locales/                # Native internationalization locale bundles
-│   ├── en/messages.json     # English messages (52 keys)
-│   └── zh_CN/messages.json  # Simplified Chinese messages (52 keys)
+│   ├── en/messages.json     # English messages (53 keys)
+│   └── zh_CN/messages.json  # Simplified Chinese messages (53 keys)
 ├── popup/                   # Popup control panel (Vanilla HTML/CSS/JS)
 │   ├── popup.html           # Popup DOM (Compact Switch + Blacklist + Snippet Manager)
 │   ├── popup.css            # Styles with Dark Mode & compact layout
 │   └── popup.js             # Dual-language switcher, Blacklist CRUD, sync storage
+├── shared/                  # Code shared by content script, popup and tests
+│   └── decoder.js           # Base64 heuristics, readable-text check, JWT parsing & status formatting
 ├── content/                 # Content scripts injected into web pages
 │   ├── content.js           # Core scanner, JWT/Image parser, hover bridge, DOM replacement
 │   └── content.css          # In-place decoded text, hover popovers & toast styles
 ├── icons/                   # High-res icons (16x16, 48x48, 128x128)
 │   └── generate_icons.py
+├── scripts/
+│   └── package.js           # Builds the release zip and checks every loaded file is inside
 └── test/                    # Test cases and verification scripts
     ├── test_page.html       # Bilingual test page (Standard, JWT, Image, Inputs, SPA mutations)
-    └── verify_decoder.js    # Node.js unit tests for decoding accuracy and heuristics
+    └── verify_decoder.js    # Node.js unit tests for shared/decoder.js (accuracy, heuristics, JWT parsing & status)
 ```
 
 ## 🚀 Installation & Usage
 
 ### Method 1: Download from GitHub Releases (Recommended)
-1. Download `base64-decoder-v1.2.3.zip` from the [Releases](https://github.com/muselabs-co/base64-auto-decoder/releases) page.
+1. Download `base64-decoder-v1.2.4.zip` from the [Releases](https://github.com/muselabs-co/base64-auto-decoder/releases) page.
 2. Extract the zip archive to a local folder.
 3. Open Google Chrome and navigate to `chrome://extensions/`.
 4. Enable **Developer mode** in the top-right corner.
@@ -94,9 +99,16 @@ base64-decoder/
 ## 🧪 Testing
 
 - **In-Browser Test**:
-  Open `test/test_page.html` in Chrome after installing the extension to inspect automatic in-place decoding, JWT formatting, image hover preview, and context menus. Use the top-right `[ 中文 | English ]` button to toggle test page language.
+  Open `test/test_page.html` in Chrome after installing the extension to inspect automatic in-place decoding, JWT formatting, image hover preview, and context menus. Use the top-right `[ 中文 | English ]` button to toggle test page language. To preview without installing the extension, open `test/test_page.html?standalone`, which loads the content script with a mocked `chrome` API (context menus are not available in this mode).
 - **Command-Line Unit Test**:
   Run unit test in the project root:
   ```bash
   node test/verify_decoder.js
   ```
+
+## 📦 Packaging a Release
+
+Build `base64-decoder-v<version>.zip` (version from `manifest.json`) in the project root. The script fails if any file referenced by `manifest.json` or `popup.html` (e.g. `shared/decoder.js`) is missing from the zip:
+```bash
+node scripts/package.js
+```

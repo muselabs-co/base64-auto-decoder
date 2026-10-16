@@ -28,7 +28,7 @@
     "description": "Hint text at the bottom of popup."
   },
   "footerVersion": {
-    "message": "v1.2.3",
+    "message": "v1.2.4",
     "description": "Version text in popup."
   },
   "copyButtonTitle": {
@@ -102,6 +102,13 @@
   "toastDecoded": {
     "message": "Decoded Base64 and copied to clipboard!",
     "description": "Toast message after decoding"
+  },
+  "toastDecodedUnsure": {
+    "message": "Copied decoded text (may not be real Base64, not replaced): $TEXT$",
+    "description": "Toast after a low-confidence context-menu decode; shows the decoded text",
+    "placeholders": {
+      "text": { "content": "$1", "example": "Z!b" }
+    }
   },
   "toastDecodeFailed": {
     "message": "Selection is not a valid Base64 string",

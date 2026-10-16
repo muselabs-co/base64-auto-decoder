@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const MESSAGES = {
     en: {
       popupTitle: 'Base64 Decoder',
-      footerVersion: 'v1.2.3',
+      footerVersion: 'v1.2.4',
       statusLabel: 'Auto Decode',
       statusEnabled: 'Enabled',
       statusDisabled: 'Disabled',
@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
     },
     zh_CN: {
       popupTitle: 'Base64 自动解码',
-      footerVersion: 'v1.2.3',
+      footerVersion: 'v1.2.4',
       statusLabel: '自动解码',
       statusEnabled: '已开启',
       statusDisabled: '已关闭',
@@ -93,6 +93,9 @@ document.addEventListener('DOMContentLoaded', () => {
       tipSync: '开关状态会自动同步至已打开的网页。'
     }
   };
+
+  // Decoding rules shared with the content script (shared/decoder.js, loaded before this script)
+  const { tryDecodeBase64, decodeJwt, getJwtStatusInfo } = globalThis.Base64Decoder;
 
   let currentLang = 'en'; // Default to English as requested
 
@@ -377,207 +380,25 @@ document.addEventListener('DOMContentLoaded', () => {
     return btoa(binString);
   }
 
-  /**
-   * Helper to format duration into human-readable compact string
-   */
-  function formatDuration(sec) {
-    sec = Math.max(0, Math.floor(sec));
-    const isZh = currentLang === 'zh_CN';
-    if (sec < 60) {
-      return isZh ? `${sec}秒` : `${sec}s`;
-    }
-    const mins = Math.floor(sec / 60);
-    if (mins < 60) {
-      return isZh ? `${mins}分钟` : `${mins}m`;
-    }
-    const hours = Math.floor(mins / 60);
-    const remMins = mins % 60;
-    if (hours < 24) {
-      if (remMins === 0) return isZh ? `${hours}小时` : `${hours}h`;
-      return isZh ? `${hours}小时${remMins}分` : `${hours}h ${remMins}m`;
-    }
-    const days = Math.floor(hours / 24);
-    const remHours = hours % 24;
-    if (remHours === 0) return isZh ? `${days}天` : `${days}d`;
-    return isZh ? `${days}天${remHours}小时` : `${days}d ${remHours}h`;
-  }
-
-  /**
-   * Convert value to valid positive number timestamp, supporting string numbers
-   */
-  function toValidTimestamp(v) {
-    if (v === undefined || v === null || v === '') return null;
-    const num = Number(v);
-    return (!isNaN(num) && num > 0) ? num : null;
-  }
-
-  /**
-   * Helper to format Unix timestamp (seconds or milliseconds) to readable local time string
-   */
-  function formatTimestamp(ts) {
-    const validTs = toValidTimestamp(ts);
-    if (!validTs) return null;
-    const ms = validTs > 1e11 ? validTs : validTs * 1000;
-    try {
-      const d = new Date(ms);
-      if (isNaN(d.getTime())) return null;
-      const pad = (n) => String(n).padStart(2, '0');
-      const Y = d.getFullYear();
-      const M = pad(d.getMonth() + 1);
-      const D = pad(d.getDate());
-      const h = pad(d.getHours());
-      const m = pad(d.getMinutes());
-      const s = pad(d.getSeconds());
-      return `${Y}-${M}-${D} ${h}:${m}:${s}`;
-    } catch (e) {
-      return null;
-    }
-  }
-
-  /**
-   * Parse and calculate JWT expiration status and relative timings
-   */
-  function parseJwtStatus(payload) {
-    if (!payload || typeof payload !== 'object') {
-      return { status: 'no_exp', label: getMsg('jwtStatusNoExp', 'No Expiry'), isExpired: false, expTimeStr: null, iatTimeStr: null, relativeStr: '' };
-    }
-
-    const isZh = currentLang === 'zh_CN';
-    const exp = toValidTimestamp(payload.exp);
-    const iat = toValidTimestamp(payload.iat);
-    const expTimeStr = exp ? formatTimestamp(exp) : null;
-    const iatTimeStr = iat ? formatTimestamp(iat) : null;
-
-    if (exp === null) {
-      return {
-        status: 'no_exp',
-        label: getMsg('jwtStatusNoExp', 'No Expiry'),
-        isExpired: false,
-        expTimeStr: null,
-        iatTimeStr,
-        relativeStr: isZh ? '无过期时间' : 'No Expiry'
-      };
-    }
-
-    const nowSec = Date.now() / 1000;
-    const expSec = exp > 1e11 ? exp / 1000 : exp;
-
-    if (nowSec > expSec) {
-      const diff = nowSec - expSec;
-      const duration = formatDuration(diff);
-      return {
-        status: 'expired',
-        label: getMsg('jwtStatusExpired', 'Expired'),
-        isExpired: true,
-        expTimeStr,
-        iatTimeStr,
-        relativeStr: isZh ? `已过期 ${duration}` : `Expired ${duration} ago`
-      };
-    } else {
-      const diff = expSec - nowSec;
-      const duration = formatDuration(diff);
-      return {
-        status: 'active',
-        label: getMsg('jwtStatusActive', 'Active'),
-        isExpired: false,
-        expTimeStr,
-        iatTimeStr,
-        relativeStr: isZh ? `还剩 ${duration} 到期` : `Expires in ${duration}`
-      };
-    }
-  }
-
   function tryParseJWT(token) {
-    if (!token || typeof token !== 'string') return null;
-    const parts = token.trim().split('.');
-    if (parts.length !== 3) return null;
-
-    function decodeB64Url(str) {
-      let norm = str.replace(/-/g, '+').replace(/_/g, '/');
-      while (norm.length % 4 !== 0) norm += '=';
-      const bin = atob(norm);
-      const bytes = new Uint8Array(bin.length);
-      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
-      return new TextDecoder('utf-8', { fatal: true }).decode(bytes);
-    }
-
-    try {
-      const headerStr = decodeB64Url(parts[0]);
-      const payloadStr = decodeB64Url(parts[1]);
-      const headerObj = JSON.parse(headerStr);
-      const payloadObj = JSON.parse(payloadStr);
-
-      if (!headerObj || typeof headerObj !== 'object' || (!headerObj.alg && !headerObj.typ)) {
-        return null;
+    const jwt = decodeJwt(token);
+    if (!jwt) return null;
+    const statusInfo = getJwtStatusInfo(jwt.payload, {
+      isZh: currentLang === 'zh_CN',
+      labels: {
+        active: getMsg('jwtStatusActive', 'Active'),
+        expired: getMsg('jwtStatusExpired', 'Expired'),
+        noExp: getMsg('jwtStatusNoExp', 'No Expiry')
       }
-
-      const statusInfo = parseJwtStatus(payloadObj);
-
-      return {
-        header: headerObj,
-        payload: payloadObj,
-        headerRaw: JSON.stringify(headerObj, null, 2),
-        payloadRaw: JSON.stringify(payloadObj, null, 2),
-        statusInfo: statusInfo
-      };
-    } catch (e) {
-      return null;
-    }
+    });
+    return { ...jwt, statusInfo };
   }
 
-  function isValidBase64Candidate(token) {
-    if (!token) return false;
-    if (!/^[A-Za-z0-9+/_-]+={0,2}$/.test(token)) return false;
-
-    const hasPadding = token.endsWith('=');
-    if (hasPadding) {
-      if (token.length < 4 || token.length % 4 !== 0) return false;
-    } else {
-      if (token.length < 8) return false;
-      if (token.length % 4 === 1) return false;
-
-      if (/^[a-z]+$/.test(token)) return false;
-      if (/^[A-Z]+$/.test(token)) return false;
-      if (/^[A-Z][a-z]+$/.test(token)) return false;
-      if (/^[0-9]+$/.test(token)) return false;
-      if (/^[0-9a-f]{16,}$/i.test(token)) return false;
-    }
-
-    return true;
-  }
-
+  // The smart-decode preview runs on every keystroke, so it uses the strict auto-scan rules
+  // (no `manual` relaxations) to avoid showing garbage for ordinary snippet text
   function decodeBase64Text(candidate) {
     if (!candidate) return null;
-    const cleaned = candidate.trim();
-    if (!isValidBase64Candidate(cleaned)) return null;
-
-    let normalized = cleaned.replace(/-/g, '+').replace(/_/g, '/');
-    while (normalized.length % 4 !== 0) {
-      normalized += '=';
-    }
-
-    try {
-      const binaryStr = atob(normalized);
-      if (!binaryStr || binaryStr.length === 0) return null;
-      const bytes = new Uint8Array(binaryStr.length);
-      for (let i = 0; i < binaryStr.length; i++) {
-        bytes[i] = binaryStr.charCodeAt(i);
-      }
-      const decoder = new TextDecoder('utf-8', { fatal: true });
-      const text = decoder.decode(bytes);
-
-      if (!text || text.trim().length === 0) return null;
-      if (text.trim() === cleaned) return null;
-      if (/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/.test(text)) return null;
-      if (/\r(?!\n)/.test(text)) return null;
-
-      const allowedRegex = /^[\s\x20-\x7E\u00A0-\u017F\u0400-\u04FF\u2000-\u206F\u20A0-\u20CF\u3000-\u303F\u3040-\u30FF\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\uFF00-\uFFEF\u{1F300}-\u{1FAFF}]+$/u;
-      if (!allowedRegex.test(text)) return null;
-
-      return text;
-    } catch (e) {
-      return null;
-    }
+    return tryDecodeBase64(candidate.trim());
   }
 
   const ICON_COPY = `<svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>`;

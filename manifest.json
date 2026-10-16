@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "__MSG_extensionName__",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "__MSG_extensionDescription__",
   "default_locale": "en",
   "icons": {
@@ -28,7 +28,7 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["content/content.js"],
+      "js": ["shared/decoder.js", "content/content.js"],
       "css": ["content/content.css"],
       "run_at": "document_idle"
     }
